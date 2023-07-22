@@ -49,18 +49,17 @@ common common-opts
 
   build-depends:
     , base
+    , bytestring
     , containers
     , mtl
-    , parsec
     , text
     , vector
-    , bytestring
 
   default-language:   Haskell2010
 
 library
   import:          common-opts
-  build-depends:   validation
+  build-depends:   megaparsec
 
   -- cabal-fmt: expand src
   exposed-modules:
@@ -71,6 +70,7 @@ library
     Cfg.Source.Deriving
     Cfg.Source.NestedConfig
     Cfg.Source.RootConfig
+    Tree.Append
 
   hs-source-dirs:  src
 

@@ -56,7 +56,7 @@ instance Generic a => Generic (ConfigRoot a) where
 -- --
 -- -- @since 0.0.5.0
 instance (AssertTopLevelRecord RootConfig a, Generic a, GConfigTree1 (Rep a)) => RootConfig (ConfigRoot a) where
-  toRootConfig _ = defaultToRootConfig (Proxy @a)
+  toRootConfig _ = defaultToRootConfig defaultRootOptions (Proxy @a)
 --
 -- -- | This type family is lifted from generic-data. We use it to prevent the user from
 -- -- deriving a `RecordInstance` for sum types
@@ -100,4 +100,4 @@ instance Generic a => Generic (SubConfig a) where
   from (SubConfig x) = from x
 
 instance (Generic a, GConfigForest1 (Rep a)) => NestedConfig (SubConfig a) where
-  toNestedConfig _ = defaultToNestedConfig (Proxy @a)
+  toNestedConfig _ = defaultToNestedConfig defaultConfigOptions (Proxy @a)
