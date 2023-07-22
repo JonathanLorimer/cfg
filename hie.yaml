@@ -1,0 +1,8 @@
+cradle:
+  cabal:
+    - path: "./src"
+      component: "lib:cfg"
+    - path: "./test"
+      component: "test:cfg-tests"
+    - path: "./app"
+      component: "exe:cfg"
