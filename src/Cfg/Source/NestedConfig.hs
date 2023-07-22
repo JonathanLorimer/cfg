@@ -70,5 +70,3 @@ instance (GConfigForest1 a, GConfigForest1 b) => GConfigForest1 (a :*: b) where
 
 instance GConfigForest1 (a :+: b) where
   gToForest1 _ _ = []
-
-

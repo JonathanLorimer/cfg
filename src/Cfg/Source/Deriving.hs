@@ -9,6 +9,8 @@ import Data.Data (Proxy(..))
 import Cfg.Source.RootConfig
 import Cfg.Source.NestedConfig
 import Cfg.Source
+import qualified Data.Text as T
+import Data.Text (Text)
 
 class Assert (pred :: Bool) (msg :: ErrorMessage)
 instance Assert 'True msg
@@ -57,7 +59,23 @@ instance Generic a => Generic (ConfigRoot a) where
 -- -- @since 0.0.5.0
 instance (AssertTopLevelRecord RootConfig a, Generic a, GConfigTree1 (Rep a)) => RootConfig (ConfigRoot a) where
   toRootConfig _ = defaultToRootConfig defaultRootOptions (Proxy @a)
---
+
+newtype ConfigRootOpts t t' a = ConfigRootOpts {unConfigRootOpts :: a}
+
+instance Generic a => Generic (ConfigRootOpts t t' a) where
+  type Rep (ConfigRootOpts t t' a) = Rep a
+  to = ConfigRootOpts . to
+  from (ConfigRootOpts x) = from x
+
+instance (LabelModifier t, LabelModifier t', AssertTopLevelRecord RootConfig a, Generic a, GConfigTree1 (Rep a)) => RootConfig (ConfigRootOpts t t' a) where
+  toRootConfig _ = defaultToRootConfig (getConfigRootOptions @t @t') (Proxy @a)
+
+class (LabelModifier t, LabelModifier t') => GetConfigRootOptions t t' where
+  getConfigRootOptions :: RootOptions
+
+instance (LabelModifier t, LabelModifier t') => GetConfigRootOptions t t' where
+  getConfigRootOptions = RootOptions (getLabelModifier @t) (ConfigOptions $ getLabelModifier @t')
+
 -- -- | This type family is lifted from generic-data. We use it to prevent the user from
 -- -- deriving a `RecordInstance` for sum types
 -- --
@@ -101,3 +119,37 @@ instance Generic a => Generic (SubConfig a) where
 
 instance (Generic a, GConfigForest1 (Rep a)) => NestedConfig (SubConfig a) where
   toNestedConfig _ = defaultToNestedConfig defaultConfigOptions (Proxy @a)
+
+newtype SubConfigOpts t a = SubConfigOpts {unSubConfigOpts :: a}
+
+instance Generic a => Generic (SubConfigOpts t a) where
+  type Rep (SubConfigOpts t a) = Rep a
+  to = SubConfigOpts . to
+  from (SubConfigOpts x) = from x
+
+instance (GetConfigOptions t, Generic a, GConfigForest1 (Rep a)) => NestedConfig (SubConfigOpts t a) where
+  toNestedConfig _ = defaultToNestedConfig (getConfigOptions @t) (Proxy @a)
+
+class GetConfigOptions t where
+  getConfigOptions :: ConfigOptions
+
+instance (LabelModifier t) => GetConfigOptions t where
+  getConfigOptions = ConfigOptions (getLabelModifier @t)
+
+data ToLower
+
+data ToUpper
+
+data Ident
+
+class LabelModifier t where
+  getLabelModifier :: Text -> Text
+
+instance LabelModifier ToLower where
+  getLabelModifier = T.toLower
+
+instance LabelModifier ToUpper where
+  getLabelModifier = T.toUpper
+
+instance LabelModifier Ident where
+  getLabelModifier = id

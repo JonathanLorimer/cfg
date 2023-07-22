@@ -2,12 +2,10 @@ module Cfg.EnvSpec where
 
 import Test.Hspec
 import Data.Tree (Tree(..))
-import Cfg.Env (appendLeaf)
 import Data.Text (Text)
-import Cfg.Env (appendLeafA)
 import Control.Monad.Identity
-import Cfg.Env (travAppendLeafA)
 import System.Environment (setEnv)
+import Tree.Append
 import Cfg.Env (envSource)
 
 spec :: Spec
