@@ -1,104 +1,104 @@
-{-# LANGUAGE DefaultSignatures #-}
-{-# LANGUAGE UndecidableInstances #-}
 module Cfg.Source where
 
-import Data.Tree (Tree (..))
-import Data.Text (Text)
-import GHC.Generics
-import qualified Data.Text as T
-import GHC.TypeError (ErrorMessage (..))
-import GHC.TypeLits (TypeError)
-import Data.Kind (Type)
-import GHC.Base (Constraint)
-import Data.Data (Proxy(..))
-import Data.Text (Text)
+import Data.Data (Proxy)
 import Data.Tree (Tree)
-import GHC.Generics (Generic (..), Generic1 (..))
-import Data.Data (Proxy(..))
+import Data.Text (Text)
+import Data.Void (Void)
+import qualified Data.Text.Lazy as TL
+import qualified Data.ByteString.Lazy as BL
+import qualified Data.ByteString as BS
+import Data.List.NonEmpty
+import Data.Vector
+import Data.Int
+import Data.Word
+import Control.Exception
 
+-- | @since 0.0.1.0
 class RootConfig a where
   toRootConfig :: Proxy a -> Tree Text
 
-  default toRootConfig :: (Generic a, GConfigTree1 (Rep a)) => Proxy a -> Tree Text
-  toRootConfig _ = defaultToTree (Proxy @a)
-
-defaultToTree :: forall a . (Generic a, GConfigTree1 (Rep a)) => Proxy a -> Tree Text
-defaultToTree _ = gToTree1 (Proxy :: Proxy (Rep a))
-
-class GConfigTree1 (a :: Type -> Type) where
-  gToTree1 :: Proxy a -> Tree Text
-
-instance RootConfig a => GConfigTree1 (K1 R a) where
-  gToTree1 _ = toRootConfig (Proxy @a)
-
-instance GConfigTree1 f => GConfigTree1 (M1 D s f) where
-  gToTree1 _ = gToTree1 (Proxy @f)
-
-instance (Constructor c, GConfigForest1 f) => GConfigTree1 (M1 C c f) where
-  gToTree1 _ 
-    | conIsRecord m = Node (T.pack $ conName m) (gToForest1 (Proxy @f))
-    | otherwise = error "Can only create a tree for named product types i.e. Records with named fields"
-    where
-      m :: t c f a
-      m = undefined
-
--- instance (Selector s, GConfigForest1 f) => GConfigTree1 (M1 S s f) where
---   gToTree1 _ =
---     if selName m == ""
---       then error "Can only create a tree for named product types i.e. Records with named fields"
---       else Node (T.pack (selName m)) (gToForest1 $ Proxy @f)
---     where
---       m :: t s f a
---       m = undefined
---
--- instance GConfigTree1 (a :+: b) where
---   gToTree1 _ = undefined
-
-
+-- | @since 0.0.1.0
 class NestedConfig a where
   toNestedConfig :: Proxy a -> [Tree Text]
 
-  default toNestedConfig :: (Generic a, GConfigForest1 (Rep a)) => Proxy a -> [Tree Text]
-  toNestedConfig _ = defaultToNestedConfig (Proxy @a)
+-- | @since 0.0.1.0
+newtype ConfigValue a = ConfigValue {unConfigValue :: a}
 
-defaultToNestedConfig :: forall a . (Generic a, GConfigForest1 (Rep a)) => Proxy a -> [Tree Text]
-defaultToNestedConfig _ = gToForest1 (Proxy :: Proxy (Rep a))
+-- | @since 0.0.1.0
+instance NestedConfig (ConfigValue a) where
+  toNestedConfig _ = []
 
+-- | @since 0.0.1.0
+deriving via (ConfigValue ()) instance NestedConfig ()
 
--- | Generic typeclass machinery for inducting on the structure
--- of the type, such that we can thread `Display` instances through
--- the structure of the type. The primary use case is for implementing
--- `RecordInstance`, which does this "threading" for record fields. This
--- machinery does, crucially, depend on child types (i.e. the type of a
--- record field) having a `Display` instance.
---
+-- | @since 0.0.1.0
+deriving via (ConfigValue Bool) instance NestedConfig Bool
+
+-- | @since 0.0.1.0
+deriving via (ConfigValue Char) instance NestedConfig Char
+
 -- @since 0.0.1.0
-class GConfigForest1 (a :: Type -> Type) where
-  gToForest1 :: Proxy a -> [Tree Text]
+deriving via (ConfigValue TL.Text) instance NestedConfig TL.Text
 
-instance GConfigForest1 V1 where
-  gToForest1 _ = []
+-- @since 0.0.1.0
+deriving via (ConfigValue BL.ByteString) instance NestedConfig BL.ByteString
 
-instance GConfigForest1 U1 where
-  gToForest1 _ = []
+-- @since 0.0.1.0
+deriving via (ConfigValue BS.ByteString) instance NestedConfig BS.ByteString
 
-instance NestedConfig a => GConfigForest1 (K1 R a) where
-  gToForest1 _ = toNestedConfig (Proxy @a)
+-- @since 0.0.1.0
+deriving via (ConfigValue Text ) instance NestedConfig Text 
 
-instance GConfigForest1 f => GConfigForest1 (M1 D s f) where
-  gToForest1 _ = gToForest1 (Proxy @f)
+-- @since 0.0.1.0
+deriving via (ConfigValue [a]) instance NestedConfig [a]
 
-instance (GConfigForest1 a, GConfigForest1 b) => GConfigForest1 (a :*: b) where
-  gToForest1 _ = gToForest1 (Proxy @a) <> gToForest1 (Proxy @b)
+-- @since 0.0.1.0
+deriving via (ConfigValue (NonEmpty a)) instance NestedConfig (NonEmpty a)
 
-instance (Selector s, GConfigForest1 f) => GConfigForest1 (M1 S s f) where
-  gToForest1 _ =
-    if selName m == ""
-      then error "Can only create a tree for named product types i.e. Records with named fields"
-      else [Node (T.pack (selName m)) (gToForest1 $ Proxy @f)]
-    where
-      m :: t s f a
-      m = undefined
+-- @since 0.0.1.0
+deriving via (ConfigValue (Vector a)) instance NestedConfig (Vector a)
 
-instance GConfigForest1 (a :+: b) where
-  gToForest1 _ = []
+-- @since 0.0.1.0
+deriving via (ConfigValue (Maybe a)) instance NestedConfig (Maybe a)
+
+-- @since 0.0.1.0
+deriving via (ConfigValue Double) instance NestedConfig Double
+
+-- @since 0.0.1.0
+deriving via (ConfigValue Float) instance NestedConfig Float
+
+-- @since 0.0.1.0
+deriving via (ConfigValue Int) instance NestedConfig Int
+
+-- @since 0.0.1.0
+deriving via (ConfigValue Int8) instance NestedConfig Int8
+
+-- @since 0.0.1.0
+deriving via (ConfigValue Int16) instance NestedConfig Int16
+
+-- @since 0.0.1.0
+deriving via (ConfigValue Int32) instance NestedConfig Int32
+
+-- @since 0.0.1.0
+deriving via (ConfigValue Int64) instance NestedConfig Int64
+
+-- @since 0.0.1.0
+deriving via (ConfigValue Integer) instance NestedConfig Integer
+
+-- @since 0.0.1.0
+deriving via (ConfigValue Word) instance NestedConfig Word
+
+-- @since 0.0.1.0
+deriving via (ConfigValue Word8) instance NestedConfig Word8
+
+-- @since 0.0.1.0
+deriving via (ConfigValue Word16) instance NestedConfig Word16
+
+-- @since 0.0.1.0
+deriving via (ConfigValue Word32) instance NestedConfig Word32
+
+-- @since 0.0.1.0
+deriving via (ConfigValue Word64) instance NestedConfig Word64
+
+-- @since 0.0.1.0
+deriving via (ConfigValue (a,b)) instance NestedConfig (a,b)
