@@ -1,30 +1,30 @@
 module Cfg.Source where
 
+import Data.ByteString qualified as BS
+import Data.ByteString.Lazy qualified as BL
 import Data.Data (Proxy)
-import Data.Tree (Tree)
-import Data.Text (Text)
-import qualified Data.Text.Lazy as TL
-import qualified Data.ByteString.Lazy as BL
-import qualified Data.ByteString as BS
-import Data.List.NonEmpty
-import Data.Vector
 import Data.Int
+import Data.List.NonEmpty
+import Data.Text (Text)
+import Data.Text.Lazy qualified as TL
+import Data.Tree (Tree)
+import Data.Vector
 import Data.Word
 
 -- | @since 0.0.1.0
 class RootConfig a where
-  toRootConfig :: Proxy a -> Tree Text
+    toRootConfig :: Proxy a -> Tree Text
 
 -- | @since 0.0.1.0
 class NestedConfig a where
-  toNestedConfig :: Proxy a -> [Tree Text]
+    toNestedConfig :: Proxy a -> [Tree Text]
 
 -- | @since 0.0.1.0
 newtype ConfigValue a = ConfigValue {unConfigValue :: a}
 
 -- | @since 0.0.1.0
 instance NestedConfig (ConfigValue a) where
-  toNestedConfig _ = []
+    toNestedConfig _ = []
 
 -- | @since 0.0.1.0
 deriving via (ConfigValue ()) instance NestedConfig ()
@@ -45,7 +45,7 @@ deriving via (ConfigValue BL.ByteString) instance NestedConfig BL.ByteString
 deriving via (ConfigValue BS.ByteString) instance NestedConfig BS.ByteString
 
 -- @since 0.0.1.0
-deriving via (ConfigValue Text ) instance NestedConfig Text 
+deriving via (ConfigValue Text) instance NestedConfig Text
 
 -- @since 0.0.1.0
 deriving via (ConfigValue [a]) instance NestedConfig [a]
@@ -99,4 +99,4 @@ deriving via (ConfigValue Word32) instance NestedConfig Word32
 deriving via (ConfigValue Word64) instance NestedConfig Word64
 
 -- @since 0.0.1.0
-deriving via (ConfigValue (a,b)) instance NestedConfig (a,b)
+deriving via (ConfigValue (a, b)) instance NestedConfig (a, b)

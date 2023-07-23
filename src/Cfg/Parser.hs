@@ -1,37 +1,38 @@
 module Cfg.Parser where
 
-import Data.Void (Void)
 import Data.Text (Text)
 import Data.Tree (Tree)
-import Text.Megaparsec.Char (string, string')
-import Text.Megaparsec (Parsec, try, (<|>))
+import Data.Void (Void)
 import GHC.Generics (Generic)
+import Text.Megaparsec (Parsec, try, (<|>))
+import Text.Megaparsec.Char (string, string')
 
 type Parser = Parsec Void Text
 
-data ConfigParseError = 
-    UnmatchedFields [Tree Text]
-  | MismatchedRootKey Text Text
-  | MismatchedKeyAndField Text (Text, Text)
-  | MissingKeys [Text]
-  deriving (Show, Generic)
+data ConfigParseError
+    = UnmatchedFields [Tree Text]
+    | MismatchedRootKey Text Text
+    | MismatchedKeyAndField Text (Text, Text)
+    | MissingKeys [Text]
+    deriving (Show, Generic)
 
 class RootParser a where
-  parseRootConfig :: Tree Text -> Either ConfigParseError a
+    parseRootConfig :: Tree Text -> Either ConfigParseError a
 
 class ConfigParser a where
-  parseConfig :: Tree Text -> Either ConfigParseError a
+    parseConfig :: Tree Text -> Either ConfigParseError a
 
 class ValueParser a where
-  parser :: Parser a
+    parser :: Parser a
 
 -- | @since 0.0.1.0
 instance ValueParser () where
-  parser = string "()" >> pure ()
+    parser = string "()" >> pure ()
 
 -- | @since 0.0.1.0
 instance ValueParser Bool where
-  parser = try (string' "true" >> pure True) <|> (string' "false" >> pure False)
+    parser = try (string' "true" >> pure True) <|> (string' "false" >> pure False)
+
 -- deriving via (ConfigValue Bool) instance NestedConfig Bool
 --
 -- -- | @since 0.0.1.0
@@ -47,7 +48,7 @@ instance ValueParser Bool where
 -- deriving via (ConfigValue BS.ByteString) instance NestedConfig BS.ByteString
 --
 -- -- @since 0.0.1.0
--- deriving via (ConfigValue Text ) instance NestedConfig Text 
+-- deriving via (ConfigValue Text ) instance NestedConfig Text
 --
 -- -- @since 0.0.1.0
 -- deriving via (ConfigValue [a]) instance NestedConfig [a]
