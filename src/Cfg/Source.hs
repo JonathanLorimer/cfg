@@ -3,7 +3,6 @@ module Cfg.Source where
 import Data.Data (Proxy)
 import Data.Tree (Tree)
 import Data.Text (Text)
-import Data.Void (Void)
 import qualified Data.Text.Lazy as TL
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.ByteString as BS
@@ -11,7 +10,6 @@ import Data.List.NonEmpty
 import Data.Vector
 import Data.Int
 import Data.Word
-import Control.Exception
 
 -- | @since 0.0.1.0
 class RootConfig a where

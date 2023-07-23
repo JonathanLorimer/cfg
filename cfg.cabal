@@ -64,15 +64,22 @@ library
   -- cabal-fmt: expand src
   exposed-modules:
     Cfg
+    Cfg.Deriving.Assert
+    Cfg.Deriving.ConfigRoot
+    Cfg.Deriving.LabelModifier
+    Cfg.Deriving.SubConfig
     Cfg.Env
+    Cfg.Options
     Cfg.Parser
+    Cfg.Parser.ConfigParser
+    Cfg.Parser.ValueParser
     Cfg.Source
-    Cfg.Source.Deriving
     Cfg.Source.NestedConfig
     Cfg.Source.RootConfig
     Tree.Append
 
   hs-source-dirs:  src
+  ghc-options:     -Wall -fdefer-typed-holes
 
 test-suite cfg-tests
   import:         common-opts
@@ -86,6 +93,7 @@ test-suite cfg-tests
   -- cabal-fmt: expand test -Main
   other-modules:
     Cfg.EnvSpec
+    Cfg.ParserSpec
     Cfg.SourceSpec
     Spec
 

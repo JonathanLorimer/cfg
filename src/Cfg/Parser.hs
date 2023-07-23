@@ -5,11 +5,22 @@ import Data.Text (Text)
 import Data.Tree (Tree)
 import Text.Megaparsec.Char (string, string')
 import Text.Megaparsec (Parsec, try, (<|>))
+import GHC.Generics (Generic)
 
 type Parser = Parsec Void Text
 
+data ConfigParseError = 
+    UnmatchedFields [Tree Text]
+  | MismatchedRootKey Text Text
+  | MismatchedKeyAndField Text (Text, Text)
+  | MissingKeys [Text]
+  deriving (Show, Generic)
+
+class RootParser a where
+  parseRootConfig :: Tree Text -> Either ConfigParseError a
+
 class ConfigParser a where
-  buildParser :: Tree Text -> Parser a
+  parseConfig :: Tree Text -> Either ConfigParseError a
 
 class ValueParser a where
   parser :: Parser a

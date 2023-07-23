@@ -4,26 +4,13 @@ import Data.Tree (Tree (..))
 import Data.Text (Text)
 import GHC.Generics
 import qualified Data.Text as T
-import GHC.TypeError (ErrorMessage (..))
-import GHC.TypeLits (TypeError)
 import Data.Kind (Type)
-import GHC.Base (Constraint)
-import Data.Data (Proxy(..))
-import Data.Text (Text)
-import Data.Tree (Tree)
-import GHC.Generics (Generic (..), Generic1 (..))
 import Data.Data (Proxy(..))
 import Cfg.Source (NestedConfig(..))
+import Cfg.Options (ConfigOptions (..))
 
-data ConfigOptions =
-  ConfigOptions  
-    { configOptionsLabelModifier :: Text -> Text }
-
-defaultConfigOptions :: ConfigOptions
-defaultConfigOptions = ConfigOptions id
-
-defaultToNestedConfig :: forall a . (Generic a, GConfigForest1 (Rep a)) => ConfigOptions -> Proxy a -> [Tree Text]
-defaultToNestedConfig opts _ = gToForest1 opts (Proxy :: Proxy (Rep a))
+defaultToNestedConfig :: forall a . (Generic a, GConfigForest (Rep a)) => ConfigOptions -> Proxy a -> [Tree Text]
+defaultToNestedConfig opts _ = gToForest opts (Proxy :: Proxy (Rep a))
 
 -- | Generic typeclass machinery for inducting on the structure
 -- of the type, such that we can thread `Display` instances through
@@ -33,40 +20,39 @@ defaultToNestedConfig opts _ = gToForest1 opts (Proxy :: Proxy (Rep a))
 -- record field) having a `Display` instance.
 --
 -- @since 0.0.1.0
-class GConfigForest1 (a :: Type -> Type) where
-  gToForest1 :: ConfigOptions -> Proxy a -> [Tree Text]
+class GConfigForest (a :: Type -> Type) where
+  gToForest :: ConfigOptions -> Proxy a -> [Tree Text]
 
-instance GConfigForest1 V1 where
-  gToForest1 _ _ = []
+instance GConfigForest V1 where
+  gToForest _ _ = []
 
-instance GConfigForest1 U1 where
-  gToForest1 _ _ = []
+instance GConfigForest U1 where
+  gToForest _ _ = []
 
-instance NestedConfig a => GConfigForest1 (K1 R a) where
-  gToForest1 _ _ = toNestedConfig (Proxy @a)
+instance NestedConfig a => GConfigForest (K1 R a) where
+  gToForest _ _ = toNestedConfig (Proxy @a)
 
-instance GConfigForest1 f => GConfigForest1 (M1 D s f) where
-  gToForest1 opts _ = gToForest1 opts (Proxy @f)
+instance GConfigForest f => GConfigForest (M1 D s f) where
+  gToForest opts _ = gToForest opts (Proxy @f)
 
-instance (Constructor c, GConfigForest1 f) => GConfigForest1 (M1 C c f) where
-  gToForest1 opts _ = gToForest1 opts (Proxy @f)
+instance (Constructor c, GConfigForest f) => GConfigForest (M1 C c f) where
+  gToForest opts _ = gToForest opts (Proxy @f)
 
-instance (Selector s, GConfigForest1 f) => GConfigForest1 (M1 S s f) where
-  gToForest1 opts _ =
+instance (Selector s, GConfigForest f) => GConfigForest (M1 S s f) where
+  gToForest opts _ =
     if selName m == ""
       then error "Can only create a tree for named product types i.e. Records with named fields"
       else [
         Node 
           (configOptionsLabelModifier opts $ T.pack (selName m)) 
-          (gToForest1 opts $ Proxy @f)
+          (gToForest opts $ Proxy @f)
       ]
-      
     where
       m :: t s f a
       m = undefined
 
-instance (GConfigForest1 a, GConfigForest1 b) => GConfigForest1 (a :*: b) where
-  gToForest1 opts _ = gToForest1 opts (Proxy @a) <> gToForest1 opts (Proxy @b)
+instance (GConfigForest a, GConfigForest b) => GConfigForest (a :*: b) where
+  gToForest opts _ = gToForest opts (Proxy @a) <> gToForest opts (Proxy @b)
 
-instance GConfigForest1 (a :+: b) where
-  gToForest1 _ _ = []
+instance GConfigForest (a :+: b) where
+  gToForest _ _ = []

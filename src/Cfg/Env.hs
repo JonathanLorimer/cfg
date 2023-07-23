@@ -5,15 +5,8 @@ import Prelude hiding (writeFile)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Text (Text)
 import Data.Text qualified as T
-import Data.Tree (Tree, levels, foldTree)
-import Data.Traversable (for)
+import Data.Tree (Tree, foldTree)
 import System.Environment (lookupEnv)
-import Data.Either (partitionEithers)
-import Data.List (intercalate)
-import Data.List.NonEmpty (NonEmpty(..), (<|))
-import Data.List.NonEmpty qualified as NE
-import Data.Tree (Tree(..))
-import Data.Foldable
 import Data.List (intersperse)
 import Tree.Append (travAppendLeafA)
 import Data.Text.IO (writeFile)

@@ -6,14 +6,11 @@ import Data.Text (Text)
 import GHC.Generics (Generic (..))
 import Data.Data (Proxy(..))
 import Cfg.Source (RootConfig(..))
-import Cfg.Source.Deriving (ConfigRoot, SubConfig)
 import Cfg.Source (NestedConfig)
-import Cfg.Source.Deriving (ToUpper)
-import Cfg.Source.Deriving (SubConfigOpts)
-import Cfg.Source.Deriving (ConfigRootOpts)
 import Cfg.Source (ConfigValue)
-import Cfg.Source.Deriving (ToLower)
-
+import Cfg.Deriving.SubConfig
+import Cfg.Deriving.ConfigRoot
+import Cfg.Deriving.LabelModifier
 
 spec :: Spec
 spec = do

@@ -1,7 +1,6 @@
 module Cfg where
 
 import Data.Text (Text)
-import Control.Monad.IO.Class (MonadIO)
 import Data.Tree (Tree)
 
 getConfig :: Monad m => 
