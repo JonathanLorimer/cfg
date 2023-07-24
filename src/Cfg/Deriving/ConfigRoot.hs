@@ -7,7 +7,6 @@ import Cfg.Deriving.LabelModifier (LabelModifier (..))
 import Cfg.Options (ConfigOptions (..), RootOptions (..), defaultRootOptions)
 import Cfg.Source (RootConfig (..))
 import Cfg.Source.RootConfig (GConfigTree, defaultToRootConfig)
-import Data.Data (Proxy (..))
 import GHC.Generics
 import Cfg.Parser.ConfigParser
 import Cfg.Parser (RootParser (..))
@@ -35,10 +34,10 @@ instance (LabelModifier t, LabelModifier t') => GetConfigRootOptions t t' where
 
 -- Source
 instance (AssertTopLevelRecord RootConfig a, Generic a, GConfigTree (Rep a)) => RootConfig (ConfigRoot a) where
-    toRootConfig _ = defaultToRootConfig defaultRootOptions (Proxy @a)
+    toRootConfig = defaultToRootConfig @a defaultRootOptions
 
 instance (LabelModifier t, LabelModifier t', AssertTopLevelRecord RootConfig a, Generic a, GConfigTree (Rep a)) => RootConfig (ConfigRootOpts t t' a) where
-    toRootConfig _ = defaultToRootConfig (getConfigRootOptions @t @t') (Proxy @a)
+    toRootConfig = defaultToRootConfig @a (getConfigRootOptions @t @t')
 
 -- Parser
 instance (AssertTopLevelRecord RootConfig a, Generic a, GRootConfigParser (Rep a)) => RootParser (ConfigRoot a) where

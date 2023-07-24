@@ -6,7 +6,6 @@ import Cfg.Deriving.LabelModifier (LabelModifier (..))
 import Cfg.Options (ConfigOptions (..), defaultConfigOptions)
 import Cfg.Source (NestedConfig (..))
 import Cfg.Source.NestedConfig
-import Data.Data (Proxy (..))
 import GHC.Generics (Generic (..))
 import Cfg.Parser.ConfigParser
 import Cfg.Parser
@@ -34,10 +33,10 @@ instance (LabelModifier t) => GetConfigOptions t where
 
 -- Source
 instance (Generic a, GConfigForest (Rep a)) => NestedConfig (SubConfig a) where
-    toNestedConfig _ = defaultToNestedConfig defaultConfigOptions (Proxy @a)
+    toNestedConfig = defaultToNestedConfig @a defaultConfigOptions
 
 instance (GetConfigOptions t, Generic a, GConfigForest (Rep a)) => NestedConfig (SubConfigOpts t a) where
-    toNestedConfig _ = defaultToNestedConfig (getConfigOptions @t) (Proxy @a)
+    toNestedConfig = defaultToNestedConfig @a (getConfigOptions @t)
 
 -- Parser
 instance (Generic a, GConfigParser (Rep a)) => ConfigParser (SubConfig a) where

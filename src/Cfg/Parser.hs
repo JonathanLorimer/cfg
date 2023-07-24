@@ -3,22 +3,22 @@
 module Cfg.Parser where
 
 import Control.Error (note)
-import Data.Functor (($>), void)
+import Data.ByteString qualified as BS
+import Data.ByteString.Lazy qualified as BL
+import Data.Functor (void, ($>))
+import Data.Int
+import Data.List.NonEmpty (NonEmpty, fromList)
 import Data.Text (Text)
+import Data.Text qualified as T
+import Data.Text.Encoding (encodeUtf8)
+import Data.Text.Lazy qualified as TL
 import Data.Tree (Tree (..))
 import Data.Void (Void)
-import GHC.Generics (Generic)
-import Text.Megaparsec (Parsec, anySingle, between, empty, parseMaybe, sepBy, some, takeRest, try, (<|>), sepBy1, option)
-import Text.Megaparsec.Char (digitChar, space1, string, string', char)
-import Text.Megaparsec.Char.Lexer qualified as L
-import qualified Data.Text.Lazy as TL
-import qualified Data.ByteString.Lazy as BL
-import Data.Text.Encoding (encodeUtf8)
-import qualified Data.ByteString as BS
-import Data.List.NonEmpty (NonEmpty, fromList)
-import qualified Data.Text as T
-import Data.Int
 import Data.Word
+import GHC.Generics (Generic)
+import Text.Megaparsec (Parsec, anySingle, between, empty, option, parseMaybe, sepBy, sepBy1, some, takeRest, try, (<|>))
+import Text.Megaparsec.Char (char, digitChar, space1, string, string')
+import Text.Megaparsec.Char.Lexer qualified as L
 
 type Parser = Parsec Void Text
 
@@ -121,13 +121,13 @@ instance ValueParser a => ConfigParser (Maybe a)
 -- Numeric Types
 
 rd :: Read a => Text -> a
-rd     = read . T.unpack
+rd = read . T.unpack
 
 plus :: Parser Text
-plus   = char '+' >> number
+plus = char '+' >> number
 
 minus :: Parser Text
-minus  = liftA2 (T.cons) (char '-') number
+minus = liftA2 (T.cons) (char '-') number
 
 number :: Parser Text
 number = T.pack <$> some digitChar
@@ -220,12 +220,12 @@ instance ValueParser Word64 where
 instance ConfigParser Word64
 
 -- | @since 0.0.1.0
-instance (ValueParser a, ValueParser b) => ValueParser (a,b) where
+instance (ValueParser a, ValueParser b) => ValueParser (a, b) where
   parser = between (L.symbol sp "(") (L.symbol sp ")") $ do
-    a <- parser @a 
+    a <- parser @a
     void $ L.symbol sp ","
     b <- parser @b
-    pure (a,b)
+    pure (a, b)
 
 -- | @since 0.0.1.0
-instance (ValueParser a, ValueParser b) => ConfigParser (a,b)
+instance (ValueParser a, ValueParser b) => ConfigParser (a, b)
