@@ -4,8 +4,8 @@ version:       0.0.1.0
 synopsis:      Type generated application configuration 
 description:
   `cfg` is a library that provides Generic machinery for generating configuration accessors, 
-  and parsers from Haskell types. This package is intended to build out additional "sources"
-  for configuration access, the environment source is provided in this package as a default.
+  and parsers from Haskell types. This package is intended to be used to build out additional 
+  "sources" for configuration access, the environment source is provided in this package as a default.
 
 category:      Configuration
 bug-reports:   https://github.com/JonathanLorimer/cfg/issues

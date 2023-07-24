@@ -15,7 +15,8 @@ defaultToRootConfig opts _ = gToTree opts (Proxy :: Proxy (Rep a))
 class GConfigTree (a :: Type -> Type) where
     gToTree :: RootOptions -> Proxy a -> Tree Text
 
--- Theoretically don't need this?
+-- TODO: Investigate whether this is required or not. Theoretically don't need this?
+--
 -- instance RootConfig a => GConfigTree (K1 R a) where
 --   gToTree opts _ = toRootConfig opts (Proxy @a)
 

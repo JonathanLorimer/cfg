@@ -7,5 +7,6 @@
     - Strip suffix
     - Casing
 - Add CI
+- Look into github releases
 - Relax version bounds and add support for multiple versions of GHC
 - Add support for defaults
