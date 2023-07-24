@@ -1,4 +1,9 @@
-module Cfg where
+module Cfg (
+  module Cfg.Parser,
+  module Cfg.Source,
+  getConfigRaw,
+  getConfig,
+) where
 
 import Data.Text (Text)
 import Data.Tree (Tree)

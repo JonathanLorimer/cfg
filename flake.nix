@@ -21,9 +21,11 @@
           inherit system;
           compilerVersion = "ghc962";
           pkgs = nixpkgs.legacyPackages.${system};
+          
           hsPkgs = pkgs.haskell.packages.${compilerVersion}.override {
             overrides = hfinal: hprev: {
               cfg = hfinal.callCabal2nix "cfg" ./. {};
+              doctest-parallel = hprev.doctest-parallel_0_3_0_1;
             };
           };
         });
@@ -33,7 +35,7 @@
       formatter = forAllSystems ({pkgs, ...}: pkgs.alejandra);
 
       # nix develop
-      devShell = forAllSystems ({hsPkgs, pkgs, ...}:
+      devShell = forAllSystems ({hsPkgs, pkgs, system, ...}:
         hsPkgs.shellFor {
           # withHoogle = true;
           packages = p: [
@@ -55,6 +57,7 @@
       packages = forAllSystems ({hsPkgs, ...}: {
           cfg = hsPkgs.cfg;
           default = hsPkgs.cfg;
+          inherit hsPkgs;
       });
 
       # You can't build the cfg package as a check because of IFD in cabal2nix

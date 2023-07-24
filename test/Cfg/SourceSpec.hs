@@ -5,7 +5,6 @@ import Cfg.Deriving.ConfigValue
 import Cfg.Deriving.LabelModifier
 import Cfg.Deriving.SubConfig
 import Cfg.Source
-import Data.Data (Proxy (..))
 import Data.Text (Text)
 import Data.Tree (Tree (..))
 import GHC.Generics (Generic (..))
@@ -29,7 +28,7 @@ spec = do
             , Node "key3" []
             , Node "key4" []
             ]
-      toRootConfig (Proxy :: Proxy (RootTyCon Text)) `shouldBe` expected
+      toRootConfig @(RootTyCon Text) `shouldBe` expected
     it "should create a tree with modified options from sample config" $ do
       let
         expected =
@@ -45,7 +44,7 @@ spec = do
             , Node "keyopts3" []
             , Node "keyopts4" []
             ]
-      toRootConfig (Proxy :: Proxy (RootTyConOpts Text)) `shouldBe` expected
+      toRootConfig @(RootTyConOpts Text) `shouldBe` expected
 
 data SumTypeConfig = Case1 | Case2
   deriving stock (Generic, Show)

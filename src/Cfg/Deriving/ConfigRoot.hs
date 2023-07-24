@@ -1,5 +1,4 @@
 {-# LANGUAGE UndecidableInstances #-}
-
 module Cfg.Deriving.ConfigRoot where
 
 import Cfg.Deriving.Assert (AssertTopLevelRecord)

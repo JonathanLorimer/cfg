@@ -1,5 +1,7 @@
 - Initial upload to hackage
 - Add haddock comments 
+    - Module comments to Cfg
+    - Module comments to Deriving
 - Add doctests
 - Add roundtrip tests
 - Add new field label modifiers
@@ -9,4 +11,5 @@
 - Add CI
 - Look into github releases
 - Relax version bounds and add support for multiple versions of GHC
+- Add README
 - Add support for defaults
