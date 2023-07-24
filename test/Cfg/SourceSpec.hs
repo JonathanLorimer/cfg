@@ -3,12 +3,13 @@ module Cfg.SourceSpec where
 import Cfg.Deriving.ConfigRoot
 import Cfg.Deriving.LabelModifier
 import Cfg.Deriving.SubConfig
-import Cfg.Source (ConfigValue, NestedConfig, RootConfig (..))
 import Data.Data (Proxy (..))
 import Data.Text (Text)
 import Data.Tree (Tree (..))
 import GHC.Generics (Generic (..))
 import Test.Hspec
+import Cfg.Source
+import Cfg.Deriving.ConfigValue
 
 spec :: Spec
 spec = do

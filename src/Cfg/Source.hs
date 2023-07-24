@@ -10,6 +10,7 @@ import Data.Text.Lazy qualified as TL
 import Data.Tree (Tree)
 import Data.Vector
 import Data.Word
+import Cfg.Deriving.ConfigValue (ConfigValue)
 
 -- | @since 0.0.1.0
 class RootConfig a where
@@ -18,9 +19,6 @@ class RootConfig a where
 -- | @since 0.0.1.0
 class NestedConfig a where
     toNestedConfig :: Proxy a -> [Tree Text]
-
--- | @since 0.0.1.0
-newtype ConfigValue a = ConfigValue {unConfigValue :: a}
 
 -- | @since 0.0.1.0
 instance NestedConfig (ConfigValue a) where

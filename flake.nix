@@ -45,7 +45,7 @@
               haskellPackages.cabal-install
               cabal2nix
               haskellPackages.ghcid
-              haskellPackages.fourmolu
+              haskellPackages.ormolu
               haskellPackages.cabal-fmt
             ]
             ++ (builtins.attrValues (import ./scripts.nix {s = pkgs.writeShellScriptBin;}));

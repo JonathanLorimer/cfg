@@ -8,6 +8,9 @@ import Cfg.Source (NestedConfig (..))
 import Cfg.Source.NestedConfig
 import Data.Data (Proxy (..))
 import GHC.Generics (Generic (..))
+import Cfg.Parser.ConfigParser
+import Cfg.Parser
+import Data.Coerce
 
 newtype SubConfig a = SubConfig {unSubConfig :: a}
 
@@ -37,8 +40,8 @@ instance (GetConfigOptions t, Generic a, GConfigForest (Rep a)) => NestedConfig 
     toNestedConfig _ = defaultToNestedConfig (getConfigOptions @t) (Proxy @a)
 
 -- Parser
--- instance (Generic a, GConfigForest (Rep a)) => NestedConfig (SubConfig a) where
---   toNestedConfig _ = defaultToNestedConfig defaultConfigOptions (Proxy @a)
---
--- instance (GetConfigOptions t, Generic a, GConfigForest (Rep a)) => NestedConfig (SubConfigOpts t a) where
---   toNestedConfig _ = defaultToNestedConfig (getConfigOptions @t) (Proxy @a)
+instance (Generic a, GConfigParser (Rep a)) => ConfigParser (SubConfig a) where
+  parseConfig tree = coerce `asTypeOf` fmap SubConfig $ defaultParseConfig defaultConfigOptions tree
+
+instance (GetConfigOptions t, Generic a, GConfigParser (Rep a)) => ConfigParser (SubConfigOpts t a) where
+  parseConfig tree = coerce `asTypeOf` fmap SubConfigOpts $ defaultParseConfig (getConfigOptions @t) tree

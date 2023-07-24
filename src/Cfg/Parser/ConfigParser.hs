@@ -1,5 +1,4 @@
 {-# LANGUAGE UndecidableInstances #-}
-
 module Cfg.Parser.ConfigParser where
 
 import Cfg.Options (ConfigOptions (..), RootOptions (..))
@@ -9,6 +8,7 @@ import Data.Text (Text)
 import Data.Text qualified as T
 import Data.Tree (Tree (..))
 import GHC.Generics
+import Data.List
 
 defaultParseRootConfig ::
     forall a.
@@ -24,14 +24,20 @@ class GRootConfigParser (f :: Type -> Type) where
 instance GRootConfigParser f => GRootConfigParser (M1 D s f) where
     gParseRootConfig opts tree = M1 <$> gParseRootConfig opts tree
 
-instance (Constructor c, GFieldParser f) => GRootConfigParser (M1 C c f) where
-    gParseRootConfig opts (Node label forest) =
+instance (Selector s, GConfigParser f) => GRootConfigParser (M1 S s f) where
+    gParseRootConfig opts tree = M1 <$> gParseConfig (rootOptionsFieldOptions opts) tree
+
+instance (Constructor c, GRootConfigParser f) => GRootConfigParser (M1 C c f) where
+    gParseRootConfig opts t@(Node label _) =
         if label == (rootOptionsLabelModifier opts . T.pack $ conName m)
-            then M1 <$> gParseFields (rootOptionsFieldOptions opts) forest
+            then M1 <$> gParseRootConfig opts t
             else Left $ MismatchedRootKey label (rootOptionsLabelModifier opts . T.pack $ conName m)
       where
         m :: t c f a
         m = undefined
+
+instance (GFieldParser (a :*: b)) => GRootConfigParser (a :*: b) where
+    gParseRootConfig opts (Node _ forest) = gParseFields (rootOptionsFieldOptions opts) forest
 
 class FieldParser a where
     parseFields :: [Tree Text] -> Either ConfigParseError a
@@ -39,25 +45,16 @@ class FieldParser a where
 class GFieldParser (f :: Type -> Type) where
     gParseFields :: ConfigOptions -> [Tree Text] -> Either ConfigParseError (f p)
 
--- NOTE: This is undecidable, but is really just the base case for products and we want to hand off
--- dealing with field selectors to the ConfigParser class
-instance (GConfigParser (M1 S s f)) => GFieldParser (M1 S s f) where
-    gParseFields _ [] = Left $ MissingKeys []
-    gParseFields opts [t] = gParseConfig opts t
-    gParseFields _ xs = Left $ UnmatchedFields xs
+instance (Selector s, GConfigParser f) => GFieldParser (M1 S s f) where
+    gParseFields opts xs = case find ((==) (configOptionsLabelModifier opts . T.pack $ selName @s undefined) . rootLabel) xs of
+                              Nothing -> Left $ MissingKeys [configOptionsLabelModifier opts . T.pack $ selName @s undefined]
+                              Just t -> M1 <$> gParseConfig opts t
 
--- NOTE: It seems like we are depending on the order of fieldSelectors corresponding with the order of our tree.
--- Since they are generated from the same type this is probably fine, but might case some issues
-instance (GConfigParser a, GFieldParser b) => GFieldParser (a :*: b) where
-    gParseFields _ [] = Left $ MissingKeys []
-    gParseFields _ (_ : []) = Left $ MissingKeys []
-    gParseFields opts (x : xs) = do
-        a <- gParseConfig opts x
+instance (GFieldParser a, GFieldParser b) => GFieldParser (a :*: b) where
+    gParseFields opts xs = do
+        a <- gParseFields opts xs
         b <- gParseFields opts xs
         pure $ a :*: b
-
--- TODO: Build up product type by traversing the list and replacing cons with :*:
--- Then recurse into field vals using `GConfigParser`
 
 defaultParseConfig ::
     forall a.
@@ -71,9 +68,11 @@ class GConfigParser (f :: Type -> Type) where
     gParseConfig :: ConfigOptions -> Tree Text -> Either ConfigParseError (f p)
 
 instance ConfigParser a => GConfigParser (K1 R a) where
-    gParseConfig _ t = K1 <$> parseConfig t
+    gParseConfig _ (Node label []) = Left $ MissingValue label
+    gParseConfig _ (Node _ [val]) = K1 <$> parseConfig val
+    gParseConfig _ tree = K1 <$> parseConfig tree
 
-instance (Constructor c, GConfigParser f) => GConfigParser (M1 D c f) where
+instance (GConfigParser f) => GConfigParser (M1 D c f) where
     gParseConfig opts t = M1 <$> gParseConfig opts t
 
 instance (Constructor c, GConfigParser f) => GConfigParser (M1 C c f) where
@@ -93,31 +92,3 @@ instance (Selector s, GConfigParser f) => GConfigParser (M1 S s f) where
 
 instance (GFieldParser (a :*: b)) => GConfigParser (a :*: b) where
     gParseConfig opts (Node _ forest) = gParseFields opts forest
-
-data ExampleSubTy = ExampleSubDat
-    { subField1 :: Text
-    , subField2 :: Int
-    }
-    deriving (Generic, Show)
-
-data ExampleTy = ExampleDat
-    { field1 :: Text
-    , field2 :: ExampleSubTy
-    }
-    deriving (Generic, Show)
-
--- subSample = (ExampleSubDat "hello" 24)
---
--- sample = ExampleDat "hello" subSample
---
--- -- $> import Cfg.Parser.ConfigParser
--- --
--- -- $> import Cfg.Parser
--- --
--- -- $> import GHC.Generics
--- --
--- -- $> from sample
--- --
--- -- $> :t (from sample)
--- --
--- -- $> :t (from subSample)

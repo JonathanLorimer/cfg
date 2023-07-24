@@ -9,6 +9,9 @@ import Cfg.Source (RootConfig (..))
 import Cfg.Source.RootConfig (GConfigTree, defaultToRootConfig)
 import Data.Data (Proxy (..))
 import GHC.Generics
+import Cfg.Parser.ConfigParser
+import Cfg.Parser (RootParser (..))
+import Data.Coerce
 
 newtype ConfigRoot a = ConfigRoot {unConfigRoot :: a}
 
@@ -38,14 +41,14 @@ instance (LabelModifier t, LabelModifier t', AssertTopLevelRecord RootConfig a, 
     toRootConfig _ = defaultToRootConfig (getConfigRootOptions @t @t') (Proxy @a)
 
 -- Parser
--- instance (AssertTopLevelRecord RootConfig a, Generic a, GConfigTree (Rep a)) => RootConfig (ConfigRoot a) where
---   toRootConfig _ = defaultToRootConfig defaultRootOptions (Proxy @a)
---
--- instance
---   ( LabelModifier t
---   , LabelModifier t'
---   , AssertTopLevelRecord RootConfig a
---   , Generic a
---   , GConfigTree (Rep a)
---   ) => RootConfig (ConfigRootOpts t t' a) where
---     toRootConfig _ = defaultToRootConfig (getConfigRootOptions @t @t') (Proxy @a)
+instance (AssertTopLevelRecord RootConfig a, Generic a, GRootConfigParser (Rep a)) => RootParser (ConfigRoot a) where
+  parseRootConfig tree = coerce `asTypeOf` fmap ConfigRoot $ defaultParseRootConfig defaultRootOptions tree
+
+instance
+  ( LabelModifier t
+  , LabelModifier t'
+  , AssertTopLevelRecord RootConfig a
+  , Generic a
+  , GRootConfigParser (Rep a)
+  ) => RootParser (ConfigRootOpts t t' a) where
+    parseRootConfig tree = coerce `asTypeOf` fmap ConfigRootOpts $ defaultParseRootConfig (getConfigRootOptions @t @t') tree

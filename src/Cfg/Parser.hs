@@ -1,11 +1,16 @@
+{-# LANGUAGE DefaultSignatures #-}
+
 module Cfg.Parser where
 
+import Control.Error (note)
 import Data.Text (Text)
-import Data.Tree (Tree)
+import Data.Tree (Tree (..))
 import Data.Void (Void)
 import GHC.Generics (Generic)
-import Text.Megaparsec (Parsec, try, (<|>))
-import Text.Megaparsec.Char (string, string')
+import Text.Megaparsec (Parsec, parseMaybe, some, try, (<|>), anySingle, takeRest, empty, between, sepBy)
+import Text.Megaparsec.Char (digitChar, string, string', space1)
+import Data.Functor (($>))
+import qualified Text.Megaparsec.Char.Lexer as L
 
 type Parser = Parsec Void Text
 
@@ -14,13 +19,23 @@ data ConfigParseError
     | MismatchedRootKey Text Text
     | MismatchedKeyAndField Text (Text, Text)
     | MissingKeys [Text]
-    deriving (Show, Generic)
+    | MissingValue Text
+    | UnexpectedKeys Text [Tree Text]
+    | ValueParseError Text
+    deriving (Eq, Show, Generic)
 
 class RootParser a where
     parseRootConfig :: Tree Text -> Either ConfigParseError a
 
 class ConfigParser a where
     parseConfig :: Tree Text -> Either ConfigParseError a
+
+    default parseConfig :: (ValueParser a) => Tree Text -> Either ConfigParseError a
+    parseConfig (Node val []) = note (ValueParseError val) $ parseMaybe parser val
+    parseConfig (Node label xs) = Left $ UnexpectedKeys label xs
+
+sp :: Parsec Void Text ()
+sp = L.space space1 empty empty
 
 class ValueParser a where
     parser :: Parser a
@@ -30,14 +45,22 @@ instance ValueParser () where
     parser = string "()" >> pure ()
 
 -- | @since 0.0.1.0
+instance ConfigParser ()
+
+-- | @since 0.0.1.0
 instance ValueParser Bool where
     parser = try (string' "true" >> pure True) <|> (string' "false" >> pure False)
 
--- deriving via (ConfigValue Bool) instance NestedConfig Bool
---
+-- | @since 0.0.1.0
+instance ConfigParser Bool
+
 -- -- | @since 0.0.1.0
--- deriving via (ConfigValue Char) instance NestedConfig Char
---
+instance ValueParser Char where
+    parser = anySingle
+
+-- -- | @since 0.0.1.0
+instance ConfigParser Char
+
 -- -- @since 0.0.1.0
 -- deriving via (ConfigValue TL.Text) instance NestedConfig TL.Text
 --
@@ -48,10 +71,16 @@ instance ValueParser Bool where
 -- deriving via (ConfigValue BS.ByteString) instance NestedConfig BS.ByteString
 --
 -- -- @since 0.0.1.0
--- deriving via (ConfigValue Text ) instance NestedConfig Text
---
--- -- @since 0.0.1.0
--- deriving via (ConfigValue [a]) instance NestedConfig [a]
+instance ValueParser Text where
+    parser = takeRest
+
+instance ConfigParser Text
+
+-- @since 0.0.1.0
+instance ValueParser a => ValueParser [a] where
+    parser = between (L.symbol sp "[") (L.symbol sp "]") $ parser @a `sepBy` (L.symbol sp ",") 
+
+instance ValueParser a => ConfigParser [a]
 --
 -- -- @since 0.0.1.0
 -- deriving via (ConfigValue (NonEmpty a)) instance NestedConfig (NonEmpty a)
@@ -60,7 +89,11 @@ instance ValueParser Bool where
 -- deriving via (ConfigValue (Vector a)) instance NestedConfig (Vector a)
 --
 -- -- @since 0.0.1.0
--- deriving via (ConfigValue (Maybe a)) instance NestedConfig (Maybe a)
+instance ValueParser a => ValueParser (Maybe a) where
+    parser = (try (string "Nothing") $> Nothing) 
+      <|> (L.symbol sp "Just" >> (Just <$> parser @a))
+
+instance ValueParser a => ConfigParser (Maybe a)
 --
 -- -- @since 0.0.1.0
 -- deriving via (ConfigValue Double) instance NestedConfig Double
@@ -68,9 +101,12 @@ instance ValueParser Bool where
 -- -- @since 0.0.1.0
 -- deriving via (ConfigValue Float) instance NestedConfig Float
 --
--- -- @since 0.0.1.0
--- deriving via (ConfigValue Int) instance NestedConfig Int
---
+-- @since 0.0.1.0
+instance ValueParser Int where
+    parser = read <$> some digitChar
+
+instance ConfigParser Int
+
 -- -- @since 0.0.1.0
 -- deriving via (ConfigValue Int8) instance NestedConfig Int8
 --

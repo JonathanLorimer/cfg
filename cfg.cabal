@@ -51,6 +51,7 @@ common common-opts
     , base
     , bytestring
     , containers
+    , errors
     , mtl
     , text
     , vector
@@ -66,6 +67,7 @@ library
     Cfg
     Cfg.Deriving.Assert
     Cfg.Deriving.ConfigRoot
+    Cfg.Deriving.ConfigValue
     Cfg.Deriving.LabelModifier
     Cfg.Deriving.SubConfig
     Cfg.Env
