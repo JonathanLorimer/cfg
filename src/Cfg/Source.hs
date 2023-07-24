@@ -1,5 +1,6 @@
 module Cfg.Source where
 
+import Cfg.Deriving.ConfigValue (ConfigValue)
 import Data.ByteString qualified as BS
 import Data.ByteString.Lazy qualified as BL
 import Data.Data (Proxy)
@@ -10,19 +11,18 @@ import Data.Text.Lazy qualified as TL
 import Data.Tree (Tree)
 import Data.Vector
 import Data.Word
-import Cfg.Deriving.ConfigValue (ConfigValue)
 
 -- | @since 0.0.1.0
 class RootConfig a where
-    toRootConfig :: Proxy a -> Tree Text
+  toRootConfig :: Proxy a -> Tree Text
 
 -- | @since 0.0.1.0
 class NestedConfig a where
-    toNestedConfig :: Proxy a -> [Tree Text]
+  toNestedConfig :: Proxy a -> [Tree Text]
 
 -- | @since 0.0.1.0
 instance NestedConfig (ConfigValue a) where
-    toNestedConfig _ = []
+  toNestedConfig _ = []
 
 -- | @since 0.0.1.0
 deriving via (ConfigValue ()) instance NestedConfig ()

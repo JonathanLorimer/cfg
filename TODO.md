@@ -1,1 +1,11 @@
+- Initial upload to hackage
+- Add haddock comments 
+- Add doctests
+- Add roundtrip tests
+- Add new field label modifiers
+    - Strip prefix
+    - Strip suffix
+    - Casing
+- Add CI
+- Relax version bounds and add support for multiple versions of GHC
 - Add support for defaults
