@@ -16,4 +16,4 @@ instance Generic a => Generic (ConfigValue a) where
 instance (Generic a, GValueParser (Rep a)) => ValueParser (ConfigValue a) where
     parser = coerce `asTypeOf` fmap ConfigValue $ defaultValueParser @a
 
-instance (Generic a, GValueParser (Rep a)) => ConfigParser (ConfigValue a)
+instance (Generic a, GValueParser (Rep a)) => NestedParser (ConfigValue a)

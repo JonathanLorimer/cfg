@@ -39,8 +39,8 @@ instance (GetConfigOptions t, Generic a, GConfigForest (Rep a)) => NestedConfig 
     toNestedConfig = defaultToNestedConfig @a (getConfigOptions @t)
 
 -- Parser
-instance (Generic a, GConfigParser (Rep a)) => ConfigParser (SubConfig a) where
-  parseConfig tree = coerce `asTypeOf` fmap SubConfig $ defaultParseConfig defaultConfigOptions tree
+instance (Generic a, GNestedParser (Rep a)) => NestedParser (SubConfig a) where
+  parseNestedConfig tree = coerce `asTypeOf` fmap SubConfig $ defaultParseNestedConfig defaultConfigOptions tree
 
-instance (GetConfigOptions t, Generic a, GConfigParser (Rep a)) => ConfigParser (SubConfigOpts t a) where
-  parseConfig tree = coerce `asTypeOf` fmap SubConfigOpts $ defaultParseConfig (getConfigOptions @t) tree
+instance (GetConfigOptions t, Generic a, GNestedParser (Rep a)) => NestedParser (SubConfigOpts t a) where
+  parseNestedConfig tree = coerce `asTypeOf` fmap SubConfigOpts $ defaultParseNestedConfig (getConfigOptions @t) tree

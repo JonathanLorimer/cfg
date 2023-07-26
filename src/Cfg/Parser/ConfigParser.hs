@@ -2,7 +2,7 @@
 module Cfg.Parser.ConfigParser where
 
 import Cfg.Options (ConfigOptions (..), RootOptions (..))
-import Cfg.Parser (ConfigParseError (..), ConfigParser (..))
+import Cfg.Parser (ConfigParseError (..), NestedParser (..))
 import Data.Kind (Type)
 import Data.Text (Text)
 import Data.Text qualified as T
@@ -24,8 +24,8 @@ class GRootConfigParser (f :: Type -> Type) where
 instance GRootConfigParser f => GRootConfigParser (M1 D s f) where
     gParseRootConfig opts tree = M1 <$> gParseRootConfig opts tree
 
-instance (Selector s, GConfigParser f) => GRootConfigParser (M1 S s f) where
-    gParseRootConfig opts tree = M1 <$> gParseConfig (rootOptionsFieldOptions opts) tree
+instance (Selector s, GNestedParser f) => GRootConfigParser (M1 S s f) where
+    gParseRootConfig opts tree = M1 <$> gParseNestedConfig (rootOptionsFieldOptions opts) tree
 
 instance (Constructor c, GRootConfigParser f) => GRootConfigParser (M1 C c f) where
     gParseRootConfig opts t@(Node label _) =
@@ -45,10 +45,10 @@ class FieldParser a where
 class GFieldParser (f :: Type -> Type) where
     gParseFields :: ConfigOptions -> [Tree Text] -> Either ConfigParseError (f p)
 
-instance (Selector s, GConfigParser f) => GFieldParser (M1 S s f) where
+instance (Selector s, GNestedParser f) => GFieldParser (M1 S s f) where
     gParseFields opts xs = case find ((==) (configOptionsLabelModifier opts . T.pack $ selName @s undefined) . rootLabel) xs of
                               Nothing -> Left $ MissingKeys [configOptionsLabelModifier opts . T.pack $ selName @s undefined]
-                              Just t -> M1 <$> gParseConfig opts t
+                              Just t -> M1 <$> gParseNestedConfig opts t
 
 instance (GFieldParser a, GFieldParser b) => GFieldParser (a :*: b) where
     gParseFields opts xs = do
@@ -56,33 +56,33 @@ instance (GFieldParser a, GFieldParser b) => GFieldParser (a :*: b) where
         b <- gParseFields opts xs
         pure $ a :*: b
 
-defaultParseConfig ::
+defaultParseNestedConfig ::
     forall a.
-    (Generic a, GConfigParser (Rep a)) =>
+    (Generic a, GNestedParser (Rep a)) =>
     ConfigOptions ->
     Tree Text ->
     Either ConfigParseError a
-defaultParseConfig opts tree = fmap to $ gParseConfig opts tree
+defaultParseNestedConfig opts tree = fmap to $ gParseNestedConfig opts tree
 
-class GConfigParser (f :: Type -> Type) where
-    gParseConfig :: ConfigOptions -> Tree Text -> Either ConfigParseError (f p)
+class GNestedParser (f :: Type -> Type) where
+    gParseNestedConfig :: ConfigOptions -> Tree Text -> Either ConfigParseError (f p)
 
-instance ConfigParser a => GConfigParser (K1 R a) where
-    gParseConfig _ (Node label []) = Left $ MissingValue label
-    gParseConfig _ (Node _ [val]) = K1 <$> parseConfig val
-    gParseConfig _ tree = K1 <$> parseConfig tree
+instance NestedParser a => GNestedParser (K1 R a) where
+    gParseNestedConfig _ (Node label []) = Left $ MissingValue label
+    gParseNestedConfig _ (Node _ [val]) = K1 <$> parseNestedConfig val
+    gParseNestedConfig _ tree = K1 <$> parseNestedConfig tree
 
-instance (GConfigParser f) => GConfigParser (M1 D c f) where
-    gParseConfig opts t = M1 <$> gParseConfig opts t
+instance (GNestedParser f) => GNestedParser (M1 D c f) where
+    gParseNestedConfig opts t = M1 <$> gParseNestedConfig opts t
 
-instance (Constructor c, GConfigParser f) => GConfigParser (M1 C c f) where
-    gParseConfig opts t = M1 <$> gParseConfig opts t
+instance (Constructor c, GNestedParser f) => GNestedParser (M1 C c f) where
+    gParseNestedConfig opts t = M1 <$> gParseNestedConfig opts t
 
-instance (Selector s, GConfigParser f) => GConfigParser (M1 S s f) where
-    gParseConfig opts t@(Node label _) =
+instance (Selector s, GNestedParser f) => GNestedParser (M1 S s f) where
+    gParseNestedConfig opts t@(Node label _) =
         if label == modifiedSelectorName
             then Left $ MismatchedKeyAndField label (T.pack $ selName m, modifiedSelectorName)
-            else M1 <$> gParseConfig opts t
+            else M1 <$> gParseNestedConfig opts t
       where
         m :: t s f a
         m = undefined
@@ -90,5 +90,5 @@ instance (Selector s, GConfigParser f) => GConfigParser (M1 S s f) where
         modifiedSelectorName :: Text
         modifiedSelectorName = configOptionsLabelModifier opts . T.pack $ selName m
 
-instance (GFieldParser (a :*: b)) => GConfigParser (a :*: b) where
-    gParseConfig opts (Node _ forest) = gParseFields opts forest
+instance (GFieldParser (a :*: b)) => GNestedParser (a :*: b) where
+    gParseNestedConfig opts (Node _ forest) = gParseFields opts forest

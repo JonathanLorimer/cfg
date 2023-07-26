@@ -55,10 +55,11 @@ common common-opts
     TypeOperators
 
   build-depends:
-    , base        >=4.18.0 && <4.19
-    , containers  >=0.6.7  && <0.7
-    , mtl         >=2.3.1  && <2.4
-    , text        >=2.0.2  && <2.1
+    , base           >=4.18.0 && <4.19
+    , containers     >=0.6.7  && <0.7
+    , mtl            >=2.3.1  && <2.4
+    , pretty-simple
+    , text           >=2.0.2  && <2.1
 
   default-language:   Haskell2010
 
@@ -80,6 +81,7 @@ library
     Cfg.Deriving.LabelModifier
     Cfg.Deriving.SubConfig
     Cfg.Env
+    Cfg.Env.Keys
     Cfg.Options
     Cfg.Parser
     Cfg.Parser.ConfigParser
@@ -117,14 +119,15 @@ test-suite cfg-tests
     , hspec-expectations  >=0.8.2 && <0.9
     , hspec-hedgehog      >=0.0.1 && <0.1
 
-test-suite doctests
-  type:             exitcode-stdio-1.0
-  hs-source-dirs:   test
-  main-is:          doctests.hs
-  ghc-options:      -threaded
-  build-depends:
-    , base
-    , doctest-parallel
-    , cfg
-
-  default-language: Haskell2010
+-- test-suite doctests
+--   import:           common-opts
+--   type:             exitcode-stdio-1.0
+--   hs-source-dirs:   test
+--   main-is:          doctests.hs
+--   ghc-options:      -threaded
+--   build-depends:
+--     , cfg
+--     , doctest-parallel
+--     , pretty-simple
+--
+--   default-language: Haskell2010

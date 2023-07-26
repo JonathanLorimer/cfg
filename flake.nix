@@ -25,7 +25,6 @@
           hsPkgs = pkgs.haskell.packages.${compilerVersion}.override {
             overrides = hfinal: hprev: {
               cfg = hfinal.callCabal2nix "cfg" ./. {};
-              doctest-parallel = hprev.doctest-parallel_0_3_0_1;
             };
           };
         });
@@ -49,6 +48,8 @@
               haskellPackages.ghcid
               haskellPackages.fourmolu
               haskellPackages.cabal-fmt
+              nodePackages_latest.serve
+              hsPkgs.doctest_0_21_1
             ]
             ++ (builtins.attrValues (import ./scripts.nix {s = pkgs.writeShellScriptBin;}));
         });

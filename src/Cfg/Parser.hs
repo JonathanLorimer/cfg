@@ -35,11 +35,11 @@ data ConfigParseError
 class RootParser a where
   parseRootConfig :: Tree Text -> Either ConfigParseError a
 
-class ConfigParser a where
-  parseConfig :: Tree Text -> Either ConfigParseError a
-  default parseConfig :: (ValueParser a) => Tree Text -> Either ConfigParseError a
-  parseConfig (Node val []) = note (ValueParseError val) $ parseMaybe parser val
-  parseConfig (Node label xs) = Left $ UnexpectedKeys label xs
+class NestedParser a where
+  parseNestedConfig :: Tree Text -> Either ConfigParseError a
+  default parseNestedConfig :: (ValueParser a) => Tree Text -> Either ConfigParseError a
+  parseNestedConfig (Node val []) = note (ValueParseError val) $ parseMaybe parser val
+  parseNestedConfig (Node label xs) = Left $ UnexpectedKeys label xs
 
 sp :: Parsec Void Text ()
 sp = L.space space1 empty empty
@@ -52,63 +52,63 @@ instance ValueParser () where
   parser = string "()" >> pure ()
 
 -- | @since 0.0.1.0
-instance ConfigParser ()
+instance NestedParser ()
 
 -- | @since 0.0.1.0
 instance ValueParser Bool where
   parser = try (string' "true" >> pure True) <|> (string' "false" >> pure False)
 
 -- | @since 0.0.1.0
-instance ConfigParser Bool
+instance NestedParser Bool
 
 -- | @since 0.0.1.0
 instance ValueParser Char where
   parser = anySingle
 
 -- | @since 0.0.1.0
-instance ConfigParser Char
+instance NestedParser Char
 
 -- | @since 0.0.1.0
 instance ValueParser TL.Text where
   parser = TL.fromStrict <$> takeRest
 
 -- | @since 0.0.1.0
-instance ConfigParser TL.Text
+instance NestedParser TL.Text
 
 -- | @since 0.0.1.0
 instance ValueParser BL.ByteString where
   parser = BL.fromStrict . encodeUtf8 <$> takeRest
 
 -- | @since 0.0.1.0
-instance ConfigParser BL.ByteString
+instance NestedParser BL.ByteString
 
 -- | @since 0.0.1.0
 instance ValueParser BS.ByteString where
   parser = encodeUtf8 <$> takeRest
 
 -- | @since 0.0.1.0
-instance ConfigParser BS.ByteString
+instance NestedParser BS.ByteString
 
 -- @since 0.0.1.0
 instance ValueParser Text where
   parser = takeRest
 
 -- | @since 0.0.1.0
-instance ConfigParser Text
+instance NestedParser Text
 
 -- | @since 0.0.1.0
 instance ValueParser a => ValueParser [a] where
   parser = between (L.symbol sp "[") (L.symbol sp "]") $ parser @a `sepBy` (L.symbol sp ",")
 
 -- | @since 0.0.1.0
-instance ValueParser a => ConfigParser [a]
+instance ValueParser a => NestedParser [a]
 
 -- | @since 0.0.1.0
 instance ValueParser a => ValueParser (NonEmpty a) where
   parser = between (L.symbol sp "[") (L.symbol sp "]") $ fromList <$> parser @a `sepBy1` (L.symbol sp ",")
 
 -- | @since 0.0.1.0
-instance ValueParser a => ConfigParser (NonEmpty a)
+instance ValueParser a => NestedParser (NonEmpty a)
 
 -- | @since 0.0.1.0
 instance ValueParser a => ValueParser (Maybe a) where
@@ -116,7 +116,7 @@ instance ValueParser a => ValueParser (Maybe a) where
     (try (string "Nothing") $> Nothing)
       <|> (L.symbol sp "Just" >> (Just <$> parser @a))
 
-instance ValueParser a => ConfigParser (Maybe a)
+instance ValueParser a => NestedParser (Maybe a)
 
 -- Numeric Types
 
@@ -145,79 +145,79 @@ fractional = fmap rd $ liftA2 (<>) integral decimal
 instance ValueParser Double where
   parser = fractional
 
-instance ConfigParser Double
+instance NestedParser Double
 
 -- | @since 0.0.1.0
 instance ValueParser Float where
   parser = fractional
 
-instance ConfigParser Float
+instance NestedParser Float
 
 -- @since 0.0.1.0
 instance ValueParser Int where
   parser = integral
 
-instance ConfigParser Int
+instance NestedParser Int
 
 -- | @since 0.0.1.0
 instance ValueParser Int8 where
   parser = integral
 
-instance ConfigParser Int8
+instance NestedParser Int8
 
 -- | @since 0.0.1.0
 instance ValueParser Int16 where
   parser = integral
 
-instance ConfigParser Int16
+instance NestedParser Int16
 
 -- | @since 0.0.1.0
 instance ValueParser Int32 where
   parser = integral
 
-instance ConfigParser Int32
+instance NestedParser Int32
 
 -- | @since 0.0.1.0
 instance ValueParser Int64 where
   parser = integral
 
-instance ConfigParser Int64
+instance NestedParser Int64
 
 -- | @since 0.0.1.0
 instance ValueParser Integer where
   parser = integral
 
-instance ConfigParser Integer
+instance NestedParser Integer
 
 -- | @since 0.0.1.0
 instance ValueParser Word where
   parser = rd <$> number
 
-instance ConfigParser Word
+instance NestedParser Word
 
 -- | @since 0.0.1.0
 instance ValueParser Word8 where
   parser = rd <$> number
 
-instance ConfigParser Word8
+instance NestedParser Word8
 
 -- | @since 0.0.1.0
 instance ValueParser Word16 where
   parser = rd <$> number
 
-instance ConfigParser Word16
+instance NestedParser Word16
 
 -- | @since 0.0.1.0
 instance ValueParser Word32 where
   parser = rd <$> number
 
-instance ConfigParser Word32
+instance NestedParser Word32
 
 -- | @since 0.0.1.0
 instance ValueParser Word64 where
   parser = rd <$> number
 
-instance ConfigParser Word64
+instance NestedParser Word64
 
 -- | @since 0.0.1.0
 instance (ValueParser a, ValueParser b) => ValueParser (a, b) where
@@ -228,4 +228,4 @@ instance (ValueParser a, ValueParser b) => ValueParser (a, b) where
     pure (a, b)
 
 -- | @since 0.0.1.0
-instance (ValueParser a, ValueParser b) => ConfigParser (a, b)
+instance (ValueParser a, ValueParser b) => NestedParser (a, b)

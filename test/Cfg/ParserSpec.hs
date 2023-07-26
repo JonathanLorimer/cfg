@@ -12,7 +12,7 @@ import Test.Hspec
 data SumTypeConfig = Case1 | Case2
   deriving stock (Generic, Show, Eq)
   deriving (ValueParser) via (ConfigValue SumTypeConfig)
-  deriving (ConfigParser)
+  deriving (NestedParser)
 
 data SubTyCon = SubDataCon
   { subKey1 :: Text
@@ -20,7 +20,7 @@ data SubTyCon = SubDataCon
   , subKey3 :: Maybe Bool
   }
   deriving (Generic, Show, Eq)
-  deriving (ConfigParser) via (SubConfig SubTyCon)
+  deriving (NestedParser) via (SubConfig SubTyCon)
 
 data RootTyCon a = RootDataCon
   { key1 :: SumTypeConfig
