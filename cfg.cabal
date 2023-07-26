@@ -1,7 +1,7 @@
 cabal-version: 3.0
 name:          cfg
 version:       0.0.1.0
-synopsis:      Type generated application configuration 
+synopsis:      Type directed application configuration parsing and accessors
 description:
   `cfg` is a library that provides Generic machinery for generating configuration accessors, 
   and parsers from Haskell types. This package is intended to be used to build out additional 
