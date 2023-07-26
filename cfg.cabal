@@ -58,7 +58,7 @@ common common-opts
     , base           >=4.18.0 && <4.19
     , containers     >=0.6.7  && <0.7
     , mtl            >=2.3.1  && <2.4
-    , pretty-simple
+    , pretty-simple >= 4.1.2 && < 4.2
     , text           >=2.0.2  && <2.1
 
   default-language:   Haskell2010
