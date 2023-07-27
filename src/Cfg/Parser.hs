@@ -23,8 +23,7 @@ import Text.Megaparsec.Char.Lexer qualified as L
 type Parser = Parsec Void Text
 
 data ConfigParseError
-  = UnmatchedFields [Tree Text]
-  | MismatchedRootKey Text Text
+  = MismatchedRootKey Text Text
   | MismatchedKeyAndField Text (Text, Text)
   | MissingKeys [Text]
   | MissingValue Text
