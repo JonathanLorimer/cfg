@@ -12,6 +12,12 @@ spec = do
     it "ToUpper" $ do
       let text = "ThisShouldBeUpper1234"
       getLabelModifier @ToUpper text `shouldBe` "THISSHOULDBEUPPER1234"
+    it "LowerFirst" $ do
+      let text = "ThisShouldBeLower1234"
+      getLabelModifier @LowerFirst text `shouldBe` "thisShouldBeLower1234"
+    it "UpperFirst" $ do
+      let text = "thisShouldBeLower1234"
+      getLabelModifier @UpperFirst text `shouldBe` "ThisShouldBeLower1234"
     it "StripPrefix" $ do
       let text = "someConvalutedRecordNameRecordValue"
       getLabelModifier @(StripPrefix "someConvalutedRecordName") text 

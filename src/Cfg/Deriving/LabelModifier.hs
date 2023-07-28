@@ -8,10 +8,16 @@ import Data.Maybe (fromMaybe)
 import Data.Data (Proxy(..))
 import Data.Char (toLower, isUpper, isLower)
 import GHC.TypeLits
+import Data.Functor
+import Data.Char (toUpper)
 
 data ToLower
 
 data ToUpper
+
+data LowerFirst
+
+data UpperFirst
 
 data StripPrefix (prefix :: Symbol)
 
@@ -48,6 +54,12 @@ instance LabelModifier ToLower where
 instance LabelModifier ToUpper where
     getLabelModifier = T.toUpper
 
+instance LabelModifier LowerFirst where
+    getLabelModifier t = fromMaybe t $ mapFirst toLower t
+
+instance LabelModifier UpperFirst where
+    getLabelModifier t = fromMaybe t $ mapFirst toUpper t
+
 instance KnownSymbol prefix => LabelModifier (StripPrefix prefix) where
   getLabelModifier label = 
     fromMaybe label . T.stripPrefix (T.pack . symbolVal $ Proxy @prefix) $ label
@@ -58,6 +70,9 @@ instance KnownSymbol prefix => LabelModifier (StripSuffix prefix) where
 
 instance (KnownChar separator) => LabelModifier (CamelTo separator) where
   getLabelModifier = camelToText (charVal $ Proxy @separator) 
+
+mapFirst :: (Char -> Char) -> Text -> Maybe Text
+mapFirst f text = T.uncons text <&> \(first, rest) -> f first `T.cons` rest
 
 -- |
 -- 0.0.2.0
