@@ -1,5 +1,9 @@
 module Cfg.Env where
 
+import Cfg
+import Cfg.Env.Keys
+import Cfg.Parser
+import Cfg.Source (RootConfig, toRootConfig)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.List (intersperse)
 import Data.Text (Text)
@@ -9,10 +13,6 @@ import Data.Tree (Tree)
 import System.Environment (lookupEnv)
 import Tree.Append (mayAppendLeafA')
 import Prelude hiding (writeFile)
-import Cfg.Parser
-import Cfg.Source (RootConfig, toRootConfig)
-import Cfg
-import Cfg.Env.Keys
 
 -- | @since 0.0.1.0
 envSourceSep
