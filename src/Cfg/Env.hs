@@ -39,11 +39,13 @@ printDotEnv' :: FilePath -> Text -> Tree Text -> IO ()
 printDotEnv' path sep = writeFile path . foldMap (\line -> "export " <> line <> "=\n") . showEnvKeys' sep
 
 -- | @since 0.0.1.0
-getEnvConfigSep :: (MonadFail m, MonadIO m, RootConfig a, RootParser a) => Text -> m (Either ConfigParseError a)
+getEnvConfigSep
+  :: (MonadFail m, MonadIO m, RootConfig a, RootParser a) => Text -> m (Either ConfigParseError a)
 getEnvConfigSep sep = getConfig $ envSourceSep sep
 
 -- | @since 0.0.1.0
-getEnvConfig :: (MonadFail m, MonadIO m, RootConfig a, RootParser a) => m (Either ConfigParseError a)
+getEnvConfig
+  :: (MonadFail m, MonadIO m, RootConfig a, RootParser a) => m (Either ConfigParseError a)
 getEnvConfig = getConfig $ envSource
 
 -- | @since 0.0.1.0

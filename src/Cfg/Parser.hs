@@ -16,7 +16,20 @@ import Data.Tree (Tree (..))
 import Data.Void (Void)
 import Data.Word
 import GHC.Generics (Generic)
-import Text.Megaparsec (Parsec, anySingle, between, empty, option, parseMaybe, sepBy, sepBy1, some, takeRest, try, (<|>))
+import Text.Megaparsec
+  ( Parsec
+  , anySingle
+  , between
+  , empty
+  , option
+  , parseMaybe
+  , sepBy
+  , sepBy1
+  , some
+  , takeRest
+  , try
+  , (<|>)
+  )
 import Text.Megaparsec.Char (char, digitChar, space1, string, string')
 import Text.Megaparsec.Char.Lexer qualified as L
 
@@ -96,30 +109,31 @@ instance ValueParser Text where
 instance NestedParser Text
 
 -- | @since 0.0.1.0
-instance ValueParser a => ValueParser [a] where
+instance (ValueParser a) => ValueParser [a] where
   parser = between (L.symbol sp "[") (L.symbol sp "]") $ parser @a `sepBy` (L.symbol sp ",")
 
 -- | @since 0.0.1.0
-instance ValueParser a => NestedParser [a]
+instance (ValueParser a) => NestedParser [a]
 
 -- | @since 0.0.1.0
-instance ValueParser a => ValueParser (NonEmpty a) where
+instance (ValueParser a) => ValueParser (NonEmpty a) where
   parser = between (L.symbol sp "[") (L.symbol sp "]") $ fromList <$> parser @a `sepBy1` (L.symbol sp ",")
 
 -- | @since 0.0.1.0
-instance ValueParser a => NestedParser (NonEmpty a)
+instance (ValueParser a) => NestedParser (NonEmpty a)
 
 -- | @since 0.0.1.0
-instance ValueParser a => ValueParser (Maybe a) where
+-- TODO: Need to implement this better
+instance (ValueParser a) => ValueParser (Maybe a) where
   parser =
     (try (string "Nothing") $> Nothing)
       <|> (L.symbol sp "Just" >> (Just <$> parser @a))
 
-instance ValueParser a => NestedParser (Maybe a)
+instance (ValueParser a) => NestedParser (Maybe a)
 
 -- Numeric Types
 
-rd :: Read a => Text -> a
+rd :: (Read a) => Text -> a
 rd = read . T.unpack
 
 plus :: Parser Text

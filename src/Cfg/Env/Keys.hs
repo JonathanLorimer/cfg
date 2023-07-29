@@ -1,9 +1,9 @@
 module Cfg.Env.Keys where
 
-import Data.Text (Text)
-import Data.Tree (Tree, foldTree)
 import Cfg.Source (RootConfig (..))
 import Data.List (intersperse)
+import Data.Text (Text)
+import Data.Tree (Tree, foldTree)
 
 -- | @since 0.0.1.0
 getEnvKey :: Text -> [Text] -> Text
@@ -24,4 +24,3 @@ showEnvKeys' sep tree = getEnvKey sep <$> getKeys tree
 -- | @since 0.0.1.0
 showEnvKeys :: forall a. (RootConfig a) => Text -> [Text]
 showEnvKeys sep = getEnvKey sep <$> (getKeys $ toRootConfig @a)
-

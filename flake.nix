@@ -46,7 +46,7 @@
               haskellPackages.cabal-install
               cabal2nix
               haskellPackages.ghcid
-              haskellPackages.fourmolu
+              hsPkgs.fourmolu_0_13_0_0
               haskellPackages.cabal-fmt
               nodePackages_latest.serve
               hsPkgs.doctest_0_21_1
