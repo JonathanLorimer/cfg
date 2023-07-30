@@ -1,6 +1,6 @@
 module Cfg.Source.NestedConfig where
 
-import Cfg.Options (ConfigOptions (..))
+import Cfg.Options 
 import Cfg.Source (NestedConfig (..))
 import Data.Kind (Type)
 import Data.Text (Text)
@@ -36,7 +36,7 @@ instance (Selector s, GConfigForest f) => GConfigForest (M1 S s f) where
       then error "Can only create a tree for named product types i.e. Records with named fields"
       else
         [ Node
-            (configOptionsLabelModifier opts $ T.pack (selName m))
+            (keyModifier opts $ T.pack (selName m))
             (gToForest @f opts)
         ]
    where

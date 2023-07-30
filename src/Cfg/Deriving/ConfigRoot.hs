@@ -3,64 +3,63 @@
 module Cfg.Deriving.ConfigRoot where
 
 import Cfg.Deriving.Assert (AssertTopLevelRecord)
-import Cfg.Deriving.LabelModifier (LabelModifier (..))
-import Cfg.Options (ConfigOptions (..), RootOptions (..), defaultRootOptions)
-import Cfg.Parser (RootParser (..))
+import Cfg.Options 
+import Cfg.Parser 
 import Cfg.Parser.ConfigParser
 import Cfg.Source (RootConfig (..))
 import Cfg.Source.RootConfig (GConfigTree, defaultToRootConfig)
 import Data.Coerce
 import GHC.Generics
 
-newtype ConfigRoot a = ConfigRoot {unConfigRoot :: a}
+newtype Config a = Config {unConfig :: a}
 
-instance (Generic a) => Generic (ConfigRoot a) where
-  type Rep (ConfigRoot a) = Rep a
-  to = ConfigRoot . to
-  from (ConfigRoot x) = from x
+instance (Generic a) => Generic (Config a) where
+  type Rep (Config a) = Rep a
+  to = Config . to
+  from (Config x) = from x
 
-newtype ConfigRootOpts t t' a = ConfigRootOpts {unConfigRootOpts :: a}
-
-instance (Generic a) => Generic (ConfigRootOpts t t' a) where
-  type Rep (ConfigRootOpts t t' a) = Rep a
-  to = ConfigRootOpts . to
-  from (ConfigRootOpts x) = from x
-
-class (LabelModifier t, LabelModifier t') => GetConfigRootOptions t t' where
-  getConfigRootOptions :: RootOptions
-
-instance (LabelModifier t, LabelModifier t') => GetConfigRootOptions t t' where
-  getConfigRootOptions = RootOptions (getLabelModifier @t) (ConfigOptions $ getLabelModifier @t')
+-- newtype ConfigRootOpts t t' a = ConfigRootOpts {unConfigRootOpts :: a}
+--
+-- instance (Generic a) => Generic (ConfigRootOpts t t' a) where
+--   type Rep (ConfigRootOpts t t' a) = Rep a
+--   to = ConfigRootOpts . to
+--   from (ConfigRootOpts x) = from x
+--
+-- class (LabelModifier t, LabelModifier t') => GetConfigRootOptions t t' where
+--   getConfigRootOptions :: RootOptions
+--
+-- instance (LabelModifier t, LabelModifier t') => GetConfigRootOptions t t' where
+--   getConfigRootOptions = RootOptions (getLabelModifier @t) (ConfigOptions $ getLabelModifier @t')
 
 -- Source
-instance (AssertTopLevelRecord RootConfig a, Generic a, GConfigTree (Rep a)) => RootConfig (ConfigRoot a) where
-  toRootConfig = defaultToRootConfig @a defaultRootOptions
+instance (AssertTopLevelRecord RootConfig a, Generic a, GConfigTree (Rep a)) => RootConfig (Config a) where
+  toRootConfig = defaultToRootConfig @a defaultConfigOptions
 
-instance
-  ( LabelModifier t
-  , LabelModifier t'
-  , AssertTopLevelRecord RootConfig a
-  , Generic a
-  , GConfigTree (Rep a)
-  )
-  => RootConfig (ConfigRootOpts t t' a)
-  where
-  toRootConfig = defaultToRootConfig @a (getConfigRootOptions @t @t')
+-- instance
+--   ( LabelModifier t
+--   , LabelModifier t'
+--   , AssertTopLevelRecord RootConfig a
+--   , Generic a
+--   , GConfigTree (Rep a)
+--   )
+--   => RootConfig (ConfigRootOpts t t' a)
+--   where
+--   toRootConfig = defaultToRootConfig @a (getConfigRootOptions @t @t')
 
 -- Parser
 instance
-  (AssertTopLevelRecord RootConfig a, Generic a, GRootConfigParser (Rep a))
-  => RootParser (ConfigRoot a)
+  (AssertTopLevelRecord ConfigParser a, Generic a, GConfigParser (Rep a))
+  => ConfigParser (Config a)
   where
-  parseRootConfig tree = coerce `asTypeOf` fmap ConfigRoot $ defaultParseRootConfig defaultRootOptions tree
+  parseConfig tree = coerce `asTypeOf` fmap Config $ defaultParseConfig defaultConfigOptions tree
 
-instance
-  ( LabelModifier t
-  , LabelModifier t'
-  , AssertTopLevelRecord RootConfig a
-  , Generic a
-  , GRootConfigParser (Rep a)
-  )
-  => RootParser (ConfigRootOpts t t' a)
-  where
-  parseRootConfig tree = coerce `asTypeOf` fmap ConfigRootOpts $ defaultParseRootConfig (getConfigRootOptions @t @t') tree
+-- instance
+--   ( LabelModifier t
+--   , LabelModifier t'
+--   , AssertTopLevelRecord RootConfig a
+--   , Generic a
+--   , GConfigParser (Rep a)
+--   )
+--   => RootParser (ConfigRootOpts t t' a)
+--   where
+--   parseRootConfig tree = coerce `asTypeOf` fmap ConfigRootOpts $ defaultParseRootConfig (getConfigRootOptions @t @t') tree

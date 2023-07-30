@@ -1,13 +1,28 @@
-module KeyTree where
+module KeyTree (
+  appendFold',
+  appendFold,
+  mayAppendFold',
+  mayAppendFold,
+  appendTraverse',
+  appendTraverse,
+  mayAppendTraverse',
+  mayAppendTraverse,
+  Map,
+  Free(..),
+  KeyTree,
+  KeyForest,
+) where
 
 import Control.Monad.Free
 import Data.Functor ((<&>))
-import Data.Map
+import Data.Map.Strict
 
 -- |
 -- Pure value | Free (Map key (KeyTree key value))
 -- @since 0.0.2.0
 type KeyTree key value = Free (Map key) value
+
+type KeyForest key value = Map key (Free (Map key) value)
 
 appendFold'
   :: (Eq k, Eq v)

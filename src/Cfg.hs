@@ -406,18 +406,18 @@ module Cfg
 
   --
 
-    getConfigRaw
-  , getConfig
+  --   getConfigRaw
+  -- , getConfig
   )
 where
 
-import Cfg.Deriving (ConfigRoot (..), ConfigValue (..))
--- Imports for examples
+import Cfg.Deriving (ConfigValue (..))
 
-import Cfg.Deriving.ConfigRoot (ConfigRootOpts (..))
+-- Imports for examples
+import Cfg.Deriving.ConfigRoot 
 import Cfg.Deriving.LabelModifier (ToUpper)
 import Cfg.Deriving.SubConfig (SubConfig (..), SubConfigOpts (..))
-import Cfg.Parser (ConfigParseError, NestedParser, RootParser (..), ValueParser)
+import Cfg.Parser 
 import Cfg.Source (FetchSource, NestedConfig, RootConfig (..))
 import Data.ByteString (ByteString)
 import Data.Text (Text)
@@ -425,130 +425,130 @@ import Data.Tree (Tree (..))
 import GHC.Generics
 
 -- | @since 0.0.1.0
-getConfigRaw
-  :: (Monad m)
-  => Tree Text
-  -> (Tree Text -> m (Tree Text))
-  -> (Tree Text -> Either e a)
-  -> m (Either e a)
-getConfigRaw keyTree source parser = parser <$> source keyTree
-
--- | @since 0.0.1.0
-getConfig
-  :: forall a m. (Monad m, RootConfig a, RootParser a) => FetchSource m -> m (Either ConfigParseError a)
-getConfig fetch = parseRootConfig @a <$> fetch (toRootConfig @a)
+-- getConfigRaw
+--   :: (Monad m)
+--   => Tree Text
+--   -> (Tree Text -> m (Tree Text))
+--   -> (Tree Text -> Either e a)
+--   -> m (Either e a)
+-- getConfigRaw keyTree source parser = parser <$> source keyTree
+--
+-- -- | @since 0.0.1.0
+-- getConfig
+--   :: forall a m. (Monad m, RootConfig a, ConfigParser a) => FetchSource m -> m (Either ConfigParseError a)
+-- getConfig fetch = parseConfig @a <$> fetch (toRootConfig @a)
 
 -------------------------------------------------------
 -- Examples for haddocks
 -------------------------------------------------------
-data Environment = Development | Production
-  deriving stock (Generic, Show)
-  deriving (NestedConfig) via ConfigValue Environment
-  deriving (ValueParser) via ConfigValue Environment
-  deriving (NestedParser)
-
-data WarpConfig = WarpConfig
-  { warpConfigPort :: Int
-  , warpConfigTimeout :: Int
-  , warpConfigHTTP2Enabled :: Bool
-  , warpConfigServerName :: ByteString
-  }
-  deriving (Generic, Show)
-  deriving (NestedConfig) via (SubConfig WarpConfig)
-  deriving (NestedParser) via (SubConfig WarpConfig)
-
-data RedisConfig = RedisConfig
-  { redisConfigHost :: Text
-  , redisConfigPort :: Int
-  , redisConfigConnectAuth :: Maybe ByteString
-  }
-  deriving (Generic, Show)
-  deriving (NestedConfig) via (SubConfig RedisConfig)
-  deriving (NestedParser) via (SubConfig RedisConfig)
-
-data AppConfig = AppConfig
-  { appConfigWarpSettings :: WarpConfig
-  , appConfigRedisSettings :: RedisConfig
-  , appConfigEnvironment :: Environment
-  }
-  deriving stock (Generic, Show)
-  deriving (RootConfig) via (ConfigRoot AppConfig)
-  deriving (RootParser) via (ConfigRoot AppConfig)
-
-sample :: Tree Text
-sample =
-  Node
-    { rootLabel = "AppConfig"
-    , subForest =
-        [ Node
-            { rootLabel = "appConfigWarpSettings"
-            , subForest =
-                [ Node
-                    { rootLabel = "warpConfigPort"
-                    , subForest = [Node "8080" []]
-                    }
-                , Node
-                    { rootLabel = "warpConfigTimeout"
-                    , subForest = [Node "30" []]
-                    }
-                , Node
-                    { rootLabel = "warpConfigHTTP2Enabled"
-                    , subForest = [Node "True" []]
-                    }
-                , Node
-                    { rootLabel = "warpConfigServerName"
-                    , subForest = [Node "MyServer" []]
-                    }
-                ]
-            }
-        , Node
-            { rootLabel = "appConfigRedisSettings"
-            , subForest =
-                [ Node
-                    { rootLabel = "redisConfigHost"
-                    , subForest = [Node "https://localhost" []]
-                    }
-                , Node
-                    { rootLabel = "redisConfigPort"
-                    , subForest = [Node "6379" []]
-                    }
-                , Node
-                    { rootLabel = "redisConfigConnectAuth"
-                    , subForest = [Node "Just password" []]
-                    }
-                ]
-            }
-        , Node
-            { rootLabel = "appConfigEnvironment"
-            , subForest = [Node "Development" []]
-            }
-        ]
-    }
-
-data EnvWarpConfig = EnvWarpConfig
-  { envWarpConfigPort :: Int
-  , envWarpConfigTimeout :: Int
-  , envWarpConfigHTTP2Enabled :: Bool
-  , envWarpConfigServerName :: ByteString
-  }
-  deriving (Generic, Show)
-  deriving (NestedConfig) via (SubConfigOpts ToUpper EnvWarpConfig)
-  deriving (NestedParser) via (SubConfigOpts ToUpper EnvWarpConfig)
-
-data EnvRedisConfig = EnvRedisConfig
-  { envRedisConfigHost :: Text
-  , envRedisConfigPort :: Int
-  , envRedisConfigConnectAuth :: Maybe ByteString
-  }
-  deriving (Generic, Show)
-  deriving (NestedConfig) via (SubConfigOpts ToUpper EnvRedisConfig)
-  deriving (NestedParser) via (SubConfigOpts ToUpper EnvRedisConfig)
-
-data EnvAppConfig = EnvAppConfig
-  { envAppConfigWarpSettings :: EnvWarpConfig
-  , envAppConfigRedisSettings :: EnvRedisConfig
-  , envAppConfigEnvironment :: Environment
-  }
-  deriving stock (Generic, Show)
-  deriving (RootConfig) via (ConfigRootOpts ToUpper ToUpper EnvAppConfig)
-  deriving (RootParser) via (ConfigRootOpts ToUpper ToUpper EnvAppConfig)
+-- data Environment = Development | Production
+--   deriving stock (Generic, Show)
+--   deriving (NestedConfig) via ConfigValue Environment
+--   deriving (ValueParser) via ConfigValue Environment
+--   deriving (NestedParser)
+--
+-- data WarpConfig = WarpConfig
+--   { warpConfigPort :: Int
+--   , warpConfigTimeout :: Int
+--   , warpConfigHTTP2Enabled :: Bool
+--   , warpConfigServerName :: ByteString
+--   }
+--   deriving (Generic, Show)
+--   deriving (NestedConfig) via (SubConfig WarpConfig)
+--   deriving (NestedParser) via (SubConfig WarpConfig)
+--
+-- data RedisConfig = RedisConfig
+--   { redisConfigHost :: Text
+--   , redisConfigPort :: Int
+--   , redisConfigConnectAuth :: Maybe ByteString
+--   }
+--   deriving (Generic, Show)
+--   deriving (NestedConfig) via (SubConfig RedisConfig)
+--   deriving (NestedParser) via (SubConfig RedisConfig)
+--
+-- data AppConfig = AppConfig
+--   { appConfigWarpSettings :: WarpConfig
+--   , appConfigRedisSettings :: RedisConfig
+--   , appConfigEnvironment :: Environment
+--   }
+--   deriving stock (Generic, Show)
+--   deriving (RootConfig) via (ConfigRoot AppConfig)
+--   deriving (RootParser) via (ConfigRoot AppConfig)
+--
+-- sample :: Tree Text
+-- sample =
+--   Node
+--     { rootLabel = "AppConfig"
+--     , subForest =
+--         [ Node
+--             { rootLabel = "appConfigWarpSettings"
+--             , subForest =
+--                 [ Node
+--                     { rootLabel = "warpConfigPort"
+--                     , subForest = [Node "8080" []]
+--                     }
+--                 , Node
+--                     { rootLabel = "warpConfigTimeout"
+--                     , subForest = [Node "30" []]
+--                     }
+--                 , Node
+--                     { rootLabel = "warpConfigHTTP2Enabled"
+--                     , subForest = [Node "True" []]
+--                     }
+--                 , Node
+--                     { rootLabel = "warpConfigServerName"
+--                     , subForest = [Node "MyServer" []]
+--                     }
+--                 ]
+--             }
+--         , Node
+--             { rootLabel = "appConfigRedisSettings"
+--             , subForest =
+--                 [ Node
+--                     { rootLabel = "redisConfigHost"
+--                     , subForest = [Node "https://localhost" []]
+--                     }
+--                 , Node
+--                     { rootLabel = "redisConfigPort"
+--                     , subForest = [Node "6379" []]
+--                     }
+--                 , Node
+--                     { rootLabel = "redisConfigConnectAuth"
+--                     , subForest = [Node "Just password" []]
+--                     }
+--                 ]
+--             }
+--         , Node
+--             { rootLabel = "appConfigEnvironment"
+--             , subForest = [Node "Development" []]
+--             }
+--         ]
+--     }
+--
+-- data EnvWarpConfig = EnvWarpConfig
+--   { envWarpConfigPort :: Int
+--   , envWarpConfigTimeout :: Int
+--   , envWarpConfigHTTP2Enabled :: Bool
+--   , envWarpConfigServerName :: ByteString
+--   }
+--   deriving (Generic, Show)
+--   deriving (NestedConfig) via (SubConfigOpts ToUpper EnvWarpConfig)
+--   deriving (NestedParser) via (SubConfigOpts ToUpper EnvWarpConfig)
+--
+-- data EnvRedisConfig = EnvRedisConfig
+--   { envRedisConfigHost :: Text
+--   , envRedisConfigPort :: Int
+--   , envRedisConfigConnectAuth :: Maybe ByteString
+--   }
+--   deriving (Generic, Show)
+--   deriving (NestedConfig) via (SubConfigOpts ToUpper EnvRedisConfig)
+--   deriving (NestedParser) via (SubConfigOpts ToUpper EnvRedisConfig)
+--
+-- data EnvAppConfig = EnvAppConfig
+--   { envAppConfigWarpSettings :: EnvWarpConfig
+--   , envAppConfigRedisSettings :: EnvRedisConfig
+--   , envAppConfigEnvironment :: Environment
+--   }
+--   deriving stock (Generic, Show)
+--   deriving (RootConfig) via (ConfigRootOpts ToUpper ToUpper EnvAppConfig)
+--   deriving (RootParser) via (ConfigRootOpts ToUpper ToUpper EnvAppConfig)

@@ -2,16 +2,28 @@ module Cfg.Options where
 
 import Data.Text (Text)
 
+data KeyOptions = KeyOptions
+  { keyOptionsModifier :: Text -> Text
+  }
+
+defaultKeyOptions :: KeyOptions
+defaultKeyOptions = KeyOptions id
+
+data RootKey = DataCon (Text -> Text) | TyCon (Text -> Text)
+
 data RootOptions = RootOptions
-  { rootOptionsLabelModifier :: Text -> Text
-  , rootOptionsFieldOptions :: ConfigOptions
+  { rootOptionsRootKey :: RootKey
+  , rootOptionsModifier :: Text -> Text
   }
 
 defaultRootOptions :: RootOptions
-defaultRootOptions = RootOptions id (ConfigOptions id)
+defaultRootOptions = RootOptions (TyCon id) id 
 
-data ConfigOptions = ConfigOptions
-  {configOptionsLabelModifier :: Text -> Text}
+data ConfigOptions = Root RootOptions | Key KeyOptions
 
 defaultConfigOptions :: ConfigOptions
-defaultConfigOptions = ConfigOptions id
+defaultConfigOptions = Key defaultKeyOptions 
+
+keyModifier :: ConfigOptions -> (Text -> Text)
+keyModifier (Root options) = rootOptionsModifier options
+keyModifier (Key options) = keyOptionsModifier options

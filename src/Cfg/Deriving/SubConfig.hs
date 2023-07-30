@@ -3,12 +3,9 @@
 module Cfg.Deriving.SubConfig where
 
 import Cfg.Deriving.LabelModifier (LabelModifier (..))
-import Cfg.Options (ConfigOptions (..), defaultConfigOptions)
-import Cfg.Parser
-import Cfg.Parser.ConfigParser
+import Cfg.Options 
 import Cfg.Source (NestedConfig (..))
 import Cfg.Source.NestedConfig
-import Data.Coerce
 import GHC.Generics (Generic (..))
 
 newtype SubConfig a = SubConfig {unSubConfig :: a}
@@ -25,22 +22,22 @@ instance (Generic a) => Generic (SubConfigOpts t a) where
   to = SubConfigOpts . to
   from (SubConfigOpts x) = from x
 
-class GetConfigOptions t where
-  getConfigOptions :: ConfigOptions
+class GetKeyOptions t where
+  getKeyOptions :: KeyOptions
 
-instance (LabelModifier t) => GetConfigOptions t where
-  getConfigOptions = ConfigOptions (getLabelModifier @t)
+instance (LabelModifier t) => GetKeyOptions t where
+  getKeyOptions = KeyOptions (getLabelModifier @t)
 
 -- Source
 instance (Generic a, GConfigForest (Rep a)) => NestedConfig (SubConfig a) where
   toNestedConfig = defaultToNestedConfig @a defaultConfigOptions
 
-instance (GetConfigOptions t, Generic a, GConfigForest (Rep a)) => NestedConfig (SubConfigOpts t a) where
-  toNestedConfig = defaultToNestedConfig @a (getConfigOptions @t)
+instance (GetKeyOptions t, Generic a, GConfigForest (Rep a)) => NestedConfig (SubConfigOpts t a) where
+  toNestedConfig = defaultToNestedConfig @a defaultConfigOptions
 
 -- Parser
-instance (Generic a, GNestedParser (Rep a)) => NestedParser (SubConfig a) where
-  parseNestedConfig tree = coerce `asTypeOf` fmap SubConfig $ defaultParseNestedConfig defaultConfigOptions tree
-
-instance (GetConfigOptions t, Generic a, GNestedParser (Rep a)) => NestedParser (SubConfigOpts t a) where
-  parseNestedConfig tree = coerce `asTypeOf` fmap SubConfigOpts $ defaultParseNestedConfig (getConfigOptions @t) tree
+-- instance (Generic a, GNestedParser (Rep a)) => NestedParser (SubConfig a) where
+--   parseNestedConfig tree = coerce `asTypeOf` fmap SubConfig $ defaultParseNestedConfig defaultConfigOptions tree
+--
+-- instance (GetConfigOptions t, Generic a, GNestedParser (Rep a)) => NestedParser (SubConfigOpts t a) where
+--   parseNestedConfig tree = coerce `asTypeOf` fmap SubConfigOpts $ defaultParseNestedConfig (getConfigOptions @t) tree
