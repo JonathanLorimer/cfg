@@ -411,11 +411,11 @@ module Cfg
   )
 where
 
-import Cfg.Deriving (ConfigValue (..))
+import Cfg.Deriving (Value (..))
 
 -- Imports for examples
-import Cfg.Deriving.ConfigRoot 
-import Cfg.Deriving.LabelModifier (ToUpper)
+import Cfg.Deriving.Config
+import Cfg.Deriving.KeyModifier (ToUpper)
 import Cfg.Parser 
 import Data.ByteString (ByteString)
 import Data.Text (Text)

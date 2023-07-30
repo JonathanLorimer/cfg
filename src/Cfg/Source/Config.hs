@@ -1,4 +1,4 @@
-module Cfg.Source.RootConfig where
+module Cfg.Source.Config where
 
 import Cfg.Options 
 import Data.Kind (Type)
@@ -14,8 +14,6 @@ defaultConfigSource opts = gConfigSource @(Rep a) opts
 
 class GConfigSource (a :: Type -> Type) where
   gConfigSource :: ConfigOptions -> KeyTree Text Text
-
--- TODO: Investigate whether this is required or not. Theoretically don't need this?
 
 instance ConfigSource a => GConfigSource (K1 R a) where
   gConfigSource _ = configSource @a

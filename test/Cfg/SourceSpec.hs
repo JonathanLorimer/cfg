@@ -1,9 +1,8 @@
 module Cfg.SourceSpec where
 
-import Cfg.Deriving.ConfigRoot
-import Cfg.Deriving.ConfigValue
-import Cfg.Deriving.LabelModifier
-import Cfg.Deriving.SubConfig
+import Cfg.Deriving.Config
+import Cfg.Deriving.Value
+import Cfg.Deriving.KeyModifier
 import Cfg.Source
 import Data.Text (Text)
 import KeyTree
@@ -48,7 +47,7 @@ spec = do
 
 data SumTypeConfig = Case1 | Case2
   deriving stock (Generic, Show)
-  deriving (ConfigSource) via ConfigValue SumTypeConfig
+  deriving (ConfigSource) via Value SumTypeConfig
 
 data SubTyCon = SubDataCon
   { subKey1 :: Text
@@ -67,19 +66,19 @@ data RootTyCon a = RootDataCon
   deriving stock (Generic, Show)
   deriving (ConfigSource) via (Config (RootTyCon a))
 
--- data SubTyConOpts = SubDataConOpts
---   { subKeyOpts1 :: Text
---   , subKeyOpts2 :: Int
---   , subKeyOpts3 :: Maybe Bool
---   }
---   deriving (Generic, Show)
---   deriving (ConfigSource) via (SubConfigOpts ToUpper SubTyCon)
---
--- data RootTyConOpts a = RootDataConOpts
---   { keyOpts1 :: SumTypeConfig
---   , keyOpts2 :: SubTyConOpts
---   , keyOpts3 :: Int
---   , keyOpts4 :: a
---   }
---   deriving stock (Generic, Show)
---   deriving (ConfigSource) via (ConfigRootOpts ToUpper ToLower (RootTyConOpts a))
+data SubTyConOpts = SubDataConOpts
+  { subKeyOpts1 :: Text
+  , subKeyOpts2 :: Int
+  , subKeyOpts3 :: Maybe Bool
+  }
+  deriving (Generic, Show)
+  deriving (ConfigSource) via (SubConfigOpts ToUpper SubTyCon)
+
+data RootTyConOpts a = RootDataConOpts
+  { keyOpts1 :: SumTypeConfig
+  , keyOpts2 :: SubTyConOpts
+  , keyOpts3 :: Int
+  , keyOpts4 :: a
+  }
+  deriving stock (Generic, Show)
+  deriving (ConfigSource) via (ConfigRootOpts ToUpper ToLower (RootTyConOpts a))

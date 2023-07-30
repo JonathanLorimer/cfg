@@ -1,4 +1,4 @@
-module Cfg.Parser.ValueParser where
+module Cfg.Parser.Value where
 
 import Cfg.Parser
 import Data.Kind (Type)

@@ -5,7 +5,7 @@ module Cfg.Parser where
 import Control.Error (note)
 import Data.ByteString qualified as BS
 import Data.ByteString.Lazy qualified as BL
-import Data.Functor (void, ($>))
+import Data.Functor (void) 
 import Data.Int
 import Data.List.NonEmpty (NonEmpty, fromList)
 import Data.Text (Text)

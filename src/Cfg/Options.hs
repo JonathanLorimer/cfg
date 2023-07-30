@@ -9,10 +9,10 @@ data KeyOptions = KeyOptions
 defaultKeyOptions :: KeyOptions
 defaultKeyOptions = KeyOptions id
 
-data RootKey = DataCon (Text -> Text) | TyCon (Text -> Text)
+data RootKey a = DataCon a | TyCon a
 
 data RootOptions = RootOptions
-  { rootOptionsRootKey :: RootKey
+  { rootOptionsRootKey :: RootKey (Text -> Text)
   , rootOptionsModifier :: Text -> Text
   }
 

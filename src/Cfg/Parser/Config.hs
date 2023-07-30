@@ -1,6 +1,6 @@
 {-# LANGUAGE UndecidableInstances #-}
 
-module Cfg.Parser.ConfigParser where
+module Cfg.Parser.Config where
 
 import Cfg.Options 
 import Cfg.Parser (ConfigParseError (..), ConfigParser(..))
@@ -68,64 +68,3 @@ instance (GConfigParser a, GConfigParser b) => GConfigParser (a :*: b) where
     a <- gParseConfig opts xs
     b <- gParseConfig opts xs
     pure $ a :*: b
-
--- class FieldParser a where
---   parseFields :: KeyForest Text Text -> Either ConfigParseError a
---
--- class GFieldParser (f :: Type -> Type) where
---   gParseFields :: ConfigOptions -> KeyForest Text Text -> Either ConfigParseError (f p)
---
--- instance (Selector s, GNestedParser f) => GFieldParser (M1 S s f) where
---   gParseFields opts keyForest = 
---     case M.lookup selectorName keyForest of
---       Nothing -> Left $ MissingKeys [selectorName] (Free keyForest)
---       Just t -> M1 <$> gParseNestedConfig opts t
---      where
---        selectorName = configOptionsLabelModifier opts . T.pack $ selName @s undefined
---
--- instance (GFieldParser a, GFieldParser b) => GFieldParser (a :*: b) where
---   gParseFields opts xs = do
---     a <- gParseFields opts xs
---     b <- gParseFields opts xs
---     pure $ a :*: b
---
--- defaultParseNestedConfig
---   :: forall a
---    . (Generic a, GNestedParser (Rep a))
---   => ConfigOptions
---   -> KeyTree Text Text
---   -> Either ConfigParseError a
--- defaultParseNestedConfig opts tree = fmap to $ gParseNestedConfig opts tree
---
--- class GNestedParser (f :: Type -> Type) where
---   gParseNestedConfig :: ConfigOptions -> KeyTree Text Text -> Either ConfigParseError (f p)
---
--- instance (NestedParser a) => GNestedParser (K1 R a) where
---   gParseNestedConfig _ kt = K1 <$> parseNestedConfig kt
---
--- instance (GNestedParser f) => GNestedParser (M1 D c f) where
---   gParseNestedConfig opts t = M1 <$> gParseNestedConfig opts t
---
--- instance (Constructor c, GNestedParser f) => GNestedParser (M1 C c f) where
---   gParseNestedConfig opts t = M1 <$> gParseNestedConfig opts t
---
--- instance (Selector s, GNestedParser f) => GNestedParser (M1 S s f) where
---   gParseNestedConfig opts t@(Node label _) =
---     if label == modifiedSelectorName
---       then Left $ MismatchedKeyAndField label (T.pack $ selName m, modifiedSelectorName)
---       else M1 <$> gParseNestedConfig opts t
---    where
---     m :: t s f a
---     m = undefined
---
---     modifiedSelectorName :: Text
---     modifiedSelectorName = configOptionsLabelModifier opts . T.pack $ selName m
---
---     case M.lookup selectorName keyForest of
---       Nothing -> Left $ MissingKeys [selectorName] (Free keyForest)
---       Just t -> M1 <$> gParseNestedConfig opts t
---      where
---        selectorName = configOptionsLabelModifier opts . T.pack $ selName @s undefined
---
--- instance (GFieldParser (a :*: b)) => GNestedParser (a :*: b) where
---   gParseNestedConfig opts (Node _ forest) = gParseFields opts forest

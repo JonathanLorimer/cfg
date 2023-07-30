@@ -79,19 +79,17 @@ library
     Cfg
     Cfg.Deriving
     Cfg.Deriving.Assert
-    Cfg.Deriving.ConfigRoot
-    Cfg.Deriving.ConfigValue
-    Cfg.Deriving.LabelModifier
-    Cfg.Deriving.SubConfig
+    Cfg.Deriving.Config
+    Cfg.Deriving.KeyModifier
+    Cfg.Deriving.Value
     Cfg.Env
     Cfg.Env.Keys
     Cfg.Options
     Cfg.Parser
-    Cfg.Parser.ConfigParser
-    Cfg.Parser.ValueParser
+    Cfg.Parser.Config
+    Cfg.Parser.Value
     Cfg.Source
-    Cfg.Source.NestedConfig
-    Cfg.Source.RootConfig
+    Cfg.Source.Config
     KeyTree
 
   hs-source-dirs:  src

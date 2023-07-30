@@ -1,6 +1,5 @@
 module Cfg.Source where
 
-import Cfg.Deriving.ConfigValue (ConfigValue)
 import Data.ByteString qualified as BS
 import Data.ByteString.Lazy qualified as BL
 import Data.Int ( Int8, Int16, Int32, Int64 )
@@ -11,6 +10,7 @@ import Data.Vector (Vector)
 import Data.Word ( Word8, Word16, Word32, Word64 )
 import KeyTree ( KeyTree, Free(Free) )
 import Data.Map.Strict ( empty )
+import Cfg.Deriving.Value (Value)
 
 -- | @since 0.0.1.0
 type FetchSource m = KeyTree Text Text -> m (KeyTree Text Text)
@@ -19,80 +19,80 @@ type FetchSource m = KeyTree Text Text -> m (KeyTree Text Text)
 class ConfigSource a where
   configSource :: KeyTree Text Text
 
-instance ConfigSource (ConfigValue a) where
+instance ConfigSource (Value a) where
   configSource = Free empty
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue ()) instance ConfigSource ()
+deriving via (Value ()) instance ConfigSource ()
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Bool) instance ConfigSource Bool
+deriving via (Value Bool) instance ConfigSource Bool
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Char) instance ConfigSource Char
+deriving via (Value Char) instance ConfigSource Char
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue TL.Text) instance ConfigSource TL.Text
+deriving via (Value TL.Text) instance ConfigSource TL.Text
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue BL.ByteString) instance ConfigSource BL.ByteString
+deriving via (Value BL.ByteString) instance ConfigSource BL.ByteString
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue BS.ByteString) instance ConfigSource BS.ByteString
+deriving via (Value BS.ByteString) instance ConfigSource BS.ByteString
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Text) instance ConfigSource Text
+deriving via (Value Text) instance ConfigSource Text
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue [a]) instance ConfigSource [a]
+deriving via (Value [a]) instance ConfigSource [a]
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue (NonEmpty a)) instance ConfigSource (NonEmpty a)
+deriving via (Value (NonEmpty a)) instance ConfigSource (NonEmpty a)
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue (Vector a)) instance ConfigSource (Vector a)
+deriving via (Value (Vector a)) instance ConfigSource (Vector a)
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue (Maybe a)) instance ConfigSource (Maybe a)
+deriving via (Value (Maybe a)) instance ConfigSource (Maybe a)
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Double) instance ConfigSource Double
+deriving via (Value Double) instance ConfigSource Double
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Float) instance ConfigSource Float
+deriving via (Value Float) instance ConfigSource Float
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Int) instance ConfigSource Int
+deriving via (Value Int) instance ConfigSource Int
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Int8) instance ConfigSource Int8
+deriving via (Value Int8) instance ConfigSource Int8
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Int16) instance ConfigSource Int16
+deriving via (Value Int16) instance ConfigSource Int16
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Int32) instance ConfigSource Int32
+deriving via (Value Int32) instance ConfigSource Int32
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Int64) instance ConfigSource Int64
+deriving via (Value Int64) instance ConfigSource Int64
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Integer) instance ConfigSource Integer
+deriving via (Value Integer) instance ConfigSource Integer
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Word) instance ConfigSource Word
+deriving via (Value Word) instance ConfigSource Word
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Word8) instance ConfigSource Word8
+deriving via (Value Word8) instance ConfigSource Word8
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Word16) instance ConfigSource Word16
+deriving via (Value Word16) instance ConfigSource Word16
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Word32) instance ConfigSource Word32
+deriving via (Value Word32) instance ConfigSource Word32
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Word64) instance ConfigSource Word64
+deriving via (Value Word64) instance ConfigSource Word64
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue (a, b)) instance ConfigSource (a, b)
+deriving via (Value (a, b)) instance ConfigSource (a, b)
