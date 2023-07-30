@@ -416,9 +416,7 @@ import Cfg.Deriving (ConfigValue (..))
 -- Imports for examples
 import Cfg.Deriving.ConfigRoot 
 import Cfg.Deriving.LabelModifier (ToUpper)
-import Cfg.Deriving.SubConfig (SubConfig (..), SubConfigOpts (..))
 import Cfg.Parser 
-import Cfg.Source (FetchSource, NestedConfig, RootConfig (..))
 import Data.ByteString (ByteString)
 import Data.Text (Text)
 import Data.Tree (Tree (..))

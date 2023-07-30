@@ -6,8 +6,8 @@ import Cfg.Deriving.Assert (AssertTopLevelRecord)
 import Cfg.Options 
 import Cfg.Parser 
 import Cfg.Parser.ConfigParser
-import Cfg.Source (RootConfig (..))
-import Cfg.Source.RootConfig (GConfigTree, defaultToRootConfig)
+import Cfg.Source 
+import Cfg.Source.RootConfig 
 import Data.Coerce
 import GHC.Generics
 
@@ -32,8 +32,8 @@ instance (Generic a) => Generic (Config a) where
 --   getConfigRootOptions = RootOptions (getLabelModifier @t) (ConfigOptions $ getLabelModifier @t')
 
 -- Source
-instance (AssertTopLevelRecord RootConfig a, Generic a, GConfigTree (Rep a)) => RootConfig (Config a) where
-  toRootConfig = defaultToRootConfig @a defaultConfigOptions
+instance (AssertTopLevelRecord ConfigSource a, Generic a, GConfigSource (Rep a)) => ConfigSource (Config a) where
+  configSource = defaultConfigSource @a defaultConfigOptions
 
 -- instance
 --   ( LabelModifier t

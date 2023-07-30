@@ -3,7 +3,6 @@ module Cfg.Env where
 import Cfg
 import Cfg.Env.Keys
 import Cfg.Parser
-import Cfg.Source (RootConfig, toRootConfig)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.List (intersperse)
 import Data.Text (Text)

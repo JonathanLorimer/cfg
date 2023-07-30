@@ -1,37 +1,64 @@
 module Cfg.Source.RootConfig where
 
 import Cfg.Options 
-import Cfg.Source.NestedConfig
 import Data.Kind (Type)
 import Data.Text (Text)
 import Data.Text qualified as T
-import Data.Tree (Tree (..))
 import GHC.Generics
+import KeyTree
+import Cfg.Source
+import Data.Map.Strict (empty, singleton)
 
-defaultToRootConfig :: forall a. (Generic a, GConfigTree (Rep a)) => ConfigOptions -> Tree Text
-defaultToRootConfig opts = gToTree @(Rep a) opts
+defaultConfigSource :: forall a. (Generic a, GConfigSource (Rep a)) => ConfigOptions -> KeyTree Text Text
+defaultConfigSource opts = gConfigSource @(Rep a) opts
 
-class GConfigTree (a :: Type -> Type) where
-  gToTree :: ConfigOptions -> Tree Text
+class GConfigSource (a :: Type -> Type) where
+  gConfigSource :: ConfigOptions -> KeyTree Text Text
 
 -- TODO: Investigate whether this is required or not. Theoretically don't need this?
---
--- instance RootConfig a => GConfigTree (K1 R a) where
---   gToTree opts _ = toRootConfig opts (Proxy @a)
 
-instance (GConfigTree f) => GConfigTree (M1 S s f) where
-  gToTree opts = gToTree @f opts
+instance ConfigSource a => GConfigSource (K1 R a) where
+  gConfigSource _ = configSource @a
 
-instance (GConfigTree f) => GConfigTree (M1 D s f) where
-  gToTree opts = gToTree @f opts
+instance (Selector s, GConfigSource f) => GConfigSource (M1 S s f) where
+  gConfigSource opts =
+    if selName @s undefined == ""
+      then error "Can only create a tree for named product types i.e. Records with named fields"
+      else Free $ singleton key value
+    where
+      key :: Text
+      key = keyModifier opts . T.pack $ selName @s undefined 
 
-instance (Constructor c, GConfigForest f) => GConfigTree (M1 C c f) where
-  gToTree opts
-    | conIsRecord m =
-        Node
-          (keyModifier opts . T.pack $ conName m)
-          (gToForest @f $ opts)
-    | otherwise = error "Can only create a tree for named product types i.e. Records with named fields"
-   where
-    m :: t c f a
-    m = undefined
+      value :: KeyTree Text Text 
+      value = gConfigSource @f opts
+
+instance (Constructor c, GConfigSource f) => GConfigSource (M1 C c f) where
+  gConfigSource opts =
+    case opts of
+      Root (RootOptions { rootOptionsRootKey = DataCon modifier }) -> 
+         if conIsRecord @c undefined 
+            then Free $ singleton (modifier key) (gConfigSource @f opts)
+            else error "Can only create a tree for named product types i.e. Records with named fields"
+      _ -> (gConfigSource @f opts)
+    where
+      key :: Text
+      key = T.pack $ conName @c undefined
+
+instance (Datatype d, GConfigSource f) => GConfigSource (M1 D d f) where
+  gConfigSource opts =
+    case opts of
+      Root (RootOptions { rootOptionsRootKey = TyCon modifier }) -> 
+        Free $ singleton (modifier key) (gConfigSource @f opts)
+      _ -> (gConfigSource @f opts)
+    where
+      key :: Text
+      key = T.pack $ datatypeName @d undefined
+
+instance (GConfigSource a, GConfigSource b) => GConfigSource (a :*: b) where
+  gConfigSource opts = 
+    case (gConfigSource @a opts, gConfigSource @b opts) of
+      (Free m, Free m') -> Free $ m <> m'
+      _ -> error "expected product types to generate subtrees (i.e. not contain Pure values)"
+
+instance GConfigSource (a :+: b) where
+  gConfigSource _ = Free empty
