@@ -22,6 +22,7 @@ instance ConfigSource a => GConfigSource (K1 R a) where
 instance (Selector s, GConfigSource f) => GConfigSource (M1 S s f) where
   gConfigSource def opts =
     if selName @s undefined == ""
+      -- TODO: Would be nice if we could turn this into a compile time error.
       then error "Can only create a tree for named product types i.e. Records with named fields"
       else 
         case def selectorName of 
