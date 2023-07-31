@@ -35,21 +35,21 @@ appendFold
   :: (Eq k, Eq v)
   => (a -> v -> v')
   -> (a -> v')
-  -> (a -> Map k (Free (Map k) v) -> a)
+  -> (k -> a -> Map k (Free (Map k) v) -> a)
   -> a
   -> KeyTree k v
   -> KeyTree k v'
 appendFold valF accF stepF acc (Free m) =
   if m == empty
     then Pure $ accF acc
-    else Free $ appendFold valF accF stepF (stepF acc m) <$> m
+    else Free $ mapWithKey (\k a -> appendFold valF accF stepF (stepF k acc m) a) m
 appendFold valF _ _ acc (Pure v) = Pure $ valF acc v
 
 mayAppendFold
   :: (Eq k, Eq v)
   => (a -> v -> v')
   -> (a -> Maybe v')
-  -> (a -> Map k (Free (Map k) v) -> a)
+  -> (k -> a -> Map k (Free (Map k) v) -> a)
   -> a
   -> KeyTree k v
   -> KeyTree k v'
@@ -58,14 +58,14 @@ mayAppendFold valF accF stepF acc (Free m) =
     then case accF acc of
       Nothing -> Free empty
       Just v -> Pure v
-    else Free $ mayAppendFold valF accF stepF (stepF acc m) <$> m
+    else Free $ mapWithKey (\k a -> mayAppendFold valF accF stepF (stepF k acc m) a) m
 mayAppendFold valF _ _ acc (Pure v) = Pure $ valF acc v
 
 appendTraverse
   :: (Applicative f, Eq k, Eq v)
   => (a -> v -> f v')
   -> (a -> f v')
-  -> (a -> Map k (Free (Map k) v) -> a)
+  -> (k -> a -> Map k (Free (Map k) v) -> a)
   -> a
   -> KeyTree k v
   -> f (KeyTree k v')

@@ -43,6 +43,7 @@ instance (Constructor c, GConfigSource f) => GConfigSource (M1 C c f) where
       Root (RootOptions { rootOptionsRootKey = ConstructorName modifier }) -> 
          if conIsRecord @c undefined 
             then Free $ singleton (modifier key) (gConfigSource @f def opts)
+            -- TODO: Would be nice if we could turn this into a compile time error.
             else error "Can only create a tree for named product types i.e. Records with named fields"
       _ -> (gConfigSource @f def opts)
     where
@@ -63,6 +64,7 @@ instance (GConfigSource a, GConfigSource b) => GConfigSource (a :*: b) where
   gConfigSource def opts = 
     case (gConfigSource @a def opts, gConfigSource @b def opts) of
       (Free m, Free m') -> Free $ m <> m'
+      -- TODO: Would be nice if we could turn this into a compile time error.
       _ -> error "expected product types to generate subtrees (i.e. not contain Pure values)"
 
 instance GConfigSource (a :+: b) where

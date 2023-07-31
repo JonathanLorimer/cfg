@@ -123,12 +123,6 @@ instance (ValueParser a) => ValueParser (NonEmpty a) where
 instance (ValueParser a) => ConfigParser (NonEmpty a)
 
 -- | @since 0.0.1.0
--- TODO: Need to implement this better
--- instance (ValueParser a) => ValueParser (Maybe a) where
---   parser =
---     (try (string "Nothing") $> Nothing)
---       <|> (L.symbol sp "Just" >> (Just <$> parser @a))
-
 instance (ValueParser a) => ConfigParser (Maybe a) where
   parseConfig (Free m) = 
     if m == M.empty 
@@ -137,7 +131,6 @@ instance (ValueParser a) => ConfigParser (Maybe a) where
   parseConfig (Pure v) = Just <$> note (ValueParseError v) (parseMaybe (parser @a) v)
 
 -- Numeric Types
-
 rd :: (Read a) => Text -> a
 rd = read . T.unpack
 
