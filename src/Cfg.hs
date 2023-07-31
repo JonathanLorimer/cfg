@@ -287,6 +287,9 @@ module Cfg
     --    - If there is a mismatch it will fail silently by not defaulting.
     --    This may result in an error when parsing (due to a missing value).
     --
+    --    - You can only set defaults via their textual representation, so your
+    --    defaults might fail to parse!
+    --
     --    - If you declare a default on a field that is supposed to hold nested config this will break, and there is nothing at the type level to prevent you from making this mistake
     --
     -- Considering all of the above, it may be preferable to do some defaulting
