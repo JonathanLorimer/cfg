@@ -406,35 +406,36 @@ module Cfg
 
   --
 
-  --   getConfigRaw
-  -- , getConfig
+    getConfigRaw
+  , getConfig
   )
 where
 
 import Cfg.Deriving (Value (..))
 
 -- Imports for examples
-import Cfg.Deriving.Config
 import Cfg.Deriving.KeyModifier (ToUpper)
 import Cfg.Parser 
 import Data.ByteString (ByteString)
 import Data.Text (Text)
 import Data.Tree (Tree (..))
 import GHC.Generics
+import KeyTree
+import Cfg.Source
 
 -- | @since 0.0.1.0
--- getConfigRaw
---   :: (Monad m)
---   => Tree Text
---   -> (Tree Text -> m (Tree Text))
---   -> (Tree Text -> Either e a)
---   -> m (Either e a)
--- getConfigRaw keyTree source parser = parser <$> source keyTree
---
--- -- | @since 0.0.1.0
--- getConfig
---   :: forall a m. (Monad m, RootConfig a, ConfigParser a) => FetchSource m -> m (Either ConfigParseError a)
--- getConfig fetch = parseConfig @a <$> fetch (toRootConfig @a)
+getConfigRaw
+  :: (Monad m)
+  => KeyTree Text Text
+  -> (KeyTree Text Text -> m (KeyTree Text Text))
+  -> (KeyTree Text Text -> Either e a)
+  -> m (Either e a)
+getConfigRaw keyTree source parser = parser <$> source keyTree
+
+-- | @since 0.0.1.0
+getConfig
+  :: forall a m. (Monad m, ConfigSource a, ConfigParser a) => FetchSource m -> m (Either ConfigParseError a)
+getConfig fetch = parseConfig @a <$> fetch (configSource @a)
 
 -------------------------------------------------------
 -- Examples for haddocks

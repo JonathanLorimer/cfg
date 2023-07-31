@@ -10,7 +10,7 @@ import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import Data.Text qualified as T
 import GHC.TypeLits
-import Cfg.Options (RootKey)
+import Cfg.Options (RootKey (..))
 
 data ToLower
 
@@ -34,7 +34,10 @@ type CamelToKebab = CamelTo '-'
 class KeyModifier t where
   getKeyModifier :: Text -> Text
 
-instance KeyModifier k => KeyModifier (RootKey k) where
+instance KeyModifier k => KeyModifier ('TypeName k) where
+  getKeyModifier = getKeyModifier @k
+
+instance KeyModifier k => KeyModifier ('ConstructorName k) where
   getKeyModifier = getKeyModifier @k
 
 instance KeyModifier '[] where

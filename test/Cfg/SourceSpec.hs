@@ -8,7 +8,8 @@ import Data.Text (Text)
 import KeyTree
 import GHC.Generics (Generic (..))
 import Test.Hspec
-import Data.Map.Strict (fromList, empty)
+import Data.Map.Strict (fromList, empty, singleton)
+import Cfg.Options
 
 spec :: Spec
 spec = do
@@ -28,22 +29,22 @@ spec = do
             , ("key4", Free empty)
             ]
       configSource @(RootTyCon Text) `shouldBe` expected
-    -- it "should create a tree with modified options from sample config" $ do
-    --   let
-    --     expected =
-    --       Node
-    --         "ROOTDATACONOPTS"
-    --         [ Node "keyopts1" []
-    --         , Node
-    --             "keyopts2"
-    --             [ Node "SUBKEY1" []
-    --             , Node "SUBKEY2" []
-    --             , Node "SUBKEY3" []
-    --             ]
-    --         , Node "keyopts3" []
-    --         , Node "keyopts4" []
-    --         ]
-    --   configSource @(RootTyConOpts Text) `shouldBe` expected
+    it "should create a tree with modified options from sample config" $ do
+      let
+        expected =
+          Free $ singleton "ROOTTYCONOPTS" $
+          Free $ fromList
+              [ ("keyopts1", Free empty)
+              , ("keyopts2", Free $ fromList
+                  [ ("SUBKEYOPTS1", Free empty)
+                  , ("SUBKEYOPTS2", Free empty)
+                  , ("SUBKEYOPTS3", Free empty)
+                  ]
+                )
+              , ("keyopts3", Free empty)
+              , ("keyopts4", Free empty)
+              ]
+      configSource @(RootTyConOpts Text) `shouldBe` expected
 
 data SumTypeConfig = Case1 | Case2
   deriving stock (Generic, Show)
@@ -72,7 +73,7 @@ data SubTyConOpts = SubDataConOpts
   , subKeyOpts3 :: Maybe Bool
   }
   deriving (Generic, Show)
-  deriving (ConfigSource) via (SubConfigOpts ToUpper SubTyCon)
+  deriving (ConfigSource) via (ConfigOpts ToUpper SubTyConOpts)
 
 data RootTyConOpts a = RootDataConOpts
   { keyOpts1 :: SumTypeConfig
@@ -81,4 +82,4 @@ data RootTyConOpts a = RootDataConOpts
   , keyOpts4 :: a
   }
   deriving stock (Generic, Show)
-  deriving (ConfigSource) via (ConfigRootOpts ToUpper ToLower (RootTyConOpts a))
+  deriving (ConfigSource) via (ConfigRoot ('TypeName ToUpper) ToLower (RootTyConOpts a))

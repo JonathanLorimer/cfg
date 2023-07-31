@@ -106,7 +106,8 @@ test-suite cfg-tests
 
   -- cabal-fmt: expand test -Main
   other-modules:
-    Cfg.Deriving.LabelModifierSpec
+    Cfg.Deriving.KeyModifierSpec
+    Cfg.Env.KeysSpec
     Cfg.EnvSpec
     Cfg.ParserSpec
     Cfg.SourceSpec

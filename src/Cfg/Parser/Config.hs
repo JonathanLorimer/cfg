@@ -28,7 +28,7 @@ instance (ConfigParser a) => GConfigParser (K1 R a) where
 instance (GConfigParser f, Datatype d) => GConfigParser (M1 D d f) where
   gParseConfig opts t@(Free keyForest) = 
     case opts of
-      Root (RootOptions { rootOptionsRootKey = TyCon modifier }) -> 
+      Root (RootOptions { rootOptionsRootKey = TypeName modifier }) -> 
         let key = modifier . T.pack $ datatypeName @d undefined
          in case M.lookup key keyForest of
               Just subTree -> M1 <$> gParseConfig opts subTree
@@ -41,7 +41,7 @@ instance (GConfigParser f, Datatype d) => GConfigParser (M1 D d f) where
 instance (Constructor c, GConfigParser f) => GConfigParser (M1 C c f) where
   gParseConfig opts t@(Free keyForest) = 
     case opts of
-      Root (RootOptions { rootOptionsRootKey = DataCon modifier }) -> 
+      Root (RootOptions { rootOptionsRootKey = ConstructorName modifier }) -> 
         let key = modifier . T.pack $ conName @c undefined
          in case M.lookup key keyForest of
               Just subTree -> M1 <$> gParseConfig opts subTree

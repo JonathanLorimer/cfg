@@ -9,7 +9,7 @@ data KeyOptions = KeyOptions
 defaultKeyOptions :: KeyOptions
 defaultKeyOptions = KeyOptions id
 
-data RootKey a = DataCon a | TyCon a
+data RootKey a = ConstructorName a | TypeName a
 
 data RootOptions = RootOptions
   { rootOptionsRootKey :: RootKey (Text -> Text)
@@ -17,7 +17,7 @@ data RootOptions = RootOptions
   }
 
 defaultRootOptions :: RootOptions
-defaultRootOptions = RootOptions (TyCon id) id 
+defaultRootOptions = RootOptions (TypeName id) id 
 
 data ConfigOptions = Root RootOptions | Key KeyOptions
 

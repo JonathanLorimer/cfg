@@ -33,7 +33,7 @@ instance (Selector s, GConfigSource f) => GConfigSource (M1 S s f) where
 instance (Constructor c, GConfigSource f) => GConfigSource (M1 C c f) where
   gConfigSource opts =
     case opts of
-      Root (RootOptions { rootOptionsRootKey = DataCon modifier }) -> 
+      Root (RootOptions { rootOptionsRootKey = ConstructorName modifier }) -> 
          if conIsRecord @c undefined 
             then Free $ singleton (modifier key) (gConfigSource @f opts)
             else error "Can only create a tree for named product types i.e. Records with named fields"
@@ -45,7 +45,7 @@ instance (Constructor c, GConfigSource f) => GConfigSource (M1 C c f) where
 instance (Datatype d, GConfigSource f) => GConfigSource (M1 D d f) where
   gConfigSource opts =
     case opts of
-      Root (RootOptions { rootOptionsRootKey = TyCon modifier }) -> 
+      Root (RootOptions { rootOptionsRootKey = TypeName modifier }) -> 
         Free $ singleton (modifier key) (gConfigSource @f opts)
       _ -> (gConfigSource @f opts)
     where

@@ -1,7 +1,7 @@
 module Cfg.ParserSpec where
 
-import Cfg.Deriving.ConfigRoot 
-import Cfg.Deriving.ConfigValue
+import Cfg.Deriving.Config 
+import Cfg.Deriving.Value
 import Cfg.Parser
 import Data.Text (Text)
 import GHC.Generics (Generic (..))
@@ -11,7 +11,7 @@ import KeyTree
 
 data SumTypeConfig = Case1 | Case2
   deriving stock (Generic, Show, Eq)
-  deriving (ValueParser) via (ConfigValue SumTypeConfig)
+  deriving (ValueParser) via (Value SumTypeConfig)
   deriving (ConfigParser)
 
 data SubTyCon = SubDataCon
