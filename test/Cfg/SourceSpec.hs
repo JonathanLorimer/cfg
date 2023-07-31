@@ -10,6 +10,7 @@ import GHC.Generics (Generic (..))
 import Test.Hspec
 import Data.Map.Strict (fromList, empty, singleton)
 import Cfg.Options
+import Cfg.Source.Default
 
 spec :: Spec
 spec = do
@@ -45,9 +46,25 @@ spec = do
               , ("keyopts4", Free empty)
               ]
       configSource @(RootTyConOpts Text) `shouldBe` expected
+    it "should create a tree with modified options from sample config AND respect defaults" $ do
+      let
+        expected =
+          Free $ singleton "ROOTTYCONOPTSDEF" $
+          Free $ fromList
+              [ ("keyoptsdef1", Pure "Case1")
+              , ("keyoptsdef2", Free $ fromList
+                  [ ("SUBKEYOPTS1", Free empty)
+                  , ("SUBKEYOPTS2", Free empty)
+                  , ("SUBKEYOPTS3", Free empty)
+                  ]
+                )
+              , ("keyoptsdef3", Free empty)
+              , ("keyoptsdef4", Free empty)
+              ]
+      configSource @(RootTyConOptsDef Text) `shouldBe` expected
 
 data SumTypeConfig = Case1 | Case2
-  deriving stock (Generic, Show)
+  deriving (Generic, Show, DefaultSource)
   deriving (ConfigSource) via Value SumTypeConfig
 
 data SubTyCon = SubDataCon
@@ -55,7 +72,7 @@ data SubTyCon = SubDataCon
   , subKey2 :: Int
   , subKey3 :: Maybe Bool
   }
-  deriving (Generic, Show)
+  deriving (Generic, Show, DefaultSource)
   deriving (ConfigSource) via (Config SubTyCon)
 
 data RootTyCon a = RootDataCon
@@ -64,7 +81,7 @@ data RootTyCon a = RootDataCon
   , key3 :: Int
   , key4 :: a
   }
-  deriving stock (Generic, Show)
+  deriving (Generic, Show, DefaultSource)
   deriving (ConfigSource) via (Config (RootTyCon a))
 
 data SubTyConOpts = SubDataConOpts
@@ -72,7 +89,7 @@ data SubTyConOpts = SubDataConOpts
   , subKeyOpts2 :: Int
   , subKeyOpts3 :: Maybe Bool
   }
-  deriving (Generic, Show)
+  deriving (Generic, Show, DefaultSource)
   deriving (ConfigSource) via (ConfigOpts ToUpper SubTyConOpts)
 
 data RootTyConOpts a = RootDataConOpts
@@ -81,5 +98,18 @@ data RootTyConOpts a = RootDataConOpts
   , keyOpts3 :: Int
   , keyOpts4 :: a
   }
-  deriving stock (Generic, Show)
+  deriving (Generic, Show, DefaultSource)
   deriving (ConfigSource) via (ConfigRoot ('TypeName ToUpper) ToLower (RootTyConOpts a))
+
+data RootTyConOptsDef a = RootTyConOptsDef
+  { keyOptsDef1 :: SumTypeConfig
+  , keyOptsDef2 :: SubTyConOpts
+  , keyOptsDef3 :: Int
+  , keyOptsDef4 :: a
+  }
+  deriving (Generic, Show)
+  deriving (ConfigSource) via (ConfigRoot ('TypeName ToUpper) ToLower (RootTyConOptsDef a))
+
+instance DefaultSource (RootTyConOptsDef a) where
+  defaults "keyOptsDef1" = Just "Case1"
+  defaults _ = Nothing

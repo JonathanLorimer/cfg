@@ -8,7 +8,7 @@ import Data.Text (Text)
 import Data.Text.Lazy qualified as TL
 import Data.Vector (Vector)
 import Data.Word ( Word8, Word16, Word32, Word64 )
-import KeyTree ( KeyTree, Free(Free) )
+import KeyTree ( KeyTree, Free(..) )
 import Data.Map.Strict ( empty )
 import Cfg.Deriving.Value (Value)
 
@@ -19,8 +19,10 @@ type FetchSource m = KeyTree Text Text -> m (KeyTree Text Text)
 class ConfigSource a where
   configSource :: KeyTree Text Text
 
+-- | @since 0.0.1.0
 instance ConfigSource (Value a) where
   configSource = Free empty
+
 
 -- | @since 0.0.1.0
 deriving via (Value ()) instance ConfigSource ()

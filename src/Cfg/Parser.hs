@@ -53,12 +53,6 @@ class ConfigParser a where
   parseConfig (Pure val) = note (ValueParseError val) $ parseMaybe parser val
   parseConfig kt = Left $ UnexpectedKeys kt
 
--- class NestedParser a where
---   parseNestedConfig :: KeyTree Text Text -> Either ConfigParseError a
---   default parseNestedConfig :: (ValueParser a) => KeyTree Text Text -> Either ConfigParseError a
---   parseNestedConfig (Pure val) = note (ValueParseError val) $ parseMaybe parser val
---   parseNestedConfig kt = Left $ UnexpectedKeys kt
-
 sp :: Parsec Void Text ()
 sp = L.space space1 empty empty
 

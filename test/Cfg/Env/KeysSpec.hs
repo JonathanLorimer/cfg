@@ -10,6 +10,7 @@ import Cfg.Options
 import Cfg.Deriving.KeyModifier
 import GHC.Generics
 import Cfg.Deriving
+import Cfg.Source.Default
 
 spec :: Spec
 spec = do
@@ -70,7 +71,7 @@ data SubTyConOpts = SubDataConOpts
   , subKeyOpts2 :: Int
   , subKeyOpts3 :: Maybe Bool
   }
-  deriving (Generic, Show)
+  deriving (Generic, Show, DefaultSource)
   deriving (ConfigSource) via (ConfigOpts [CamelToSnake, ToUpper] SubTyConOpts)
 
 data RootTyConOpts a = RootDataConOpts
@@ -79,5 +80,5 @@ data RootTyConOpts a = RootDataConOpts
   , keyOpts3 :: Int
   , keyOpts4 :: a
   }
-  deriving stock (Generic, Show)
+  deriving (Generic, Show, DefaultSource)
   deriving (ConfigSource) via (ConfigRoot ('ConstructorName [CamelToSnake, ToUpper]) [CamelToSnake, ToUpper] (RootTyConOpts a))

@@ -90,6 +90,7 @@ library
     Cfg.Parser.Value
     Cfg.Source
     Cfg.Source.Config
+    Cfg.Source.Default
     KeyTree
 
   hs-source-dirs:  src

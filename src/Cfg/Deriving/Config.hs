@@ -12,7 +12,10 @@ import Cfg.Source.Config
 import Data.Coerce
 import GHC.Generics
 import Cfg.Deriving.KeyModifier
+import Cfg.Source.Default
 
+-- | TODO: document
+-- @since 0.0.2.0
 newtype Config a = Config {unConfig :: a}
 
 instance (Generic a) => Generic (Config a) where
@@ -20,6 +23,8 @@ instance (Generic a) => Generic (Config a) where
   to = Config . to
   from (Config x) = from x
 
+-- | TODO: document
+-- @since 0.0.2.0
 newtype ConfigOpts t a = ConfigOpts {unConfigOptions :: a}
 
 instance (Generic a) => Generic (ConfigOpts t a) where
@@ -27,6 +32,8 @@ instance (Generic a) => Generic (ConfigOpts t a) where
   to = ConfigOpts . to
   from (ConfigOpts x) = from x
 
+-- | TODO: document
+-- @since 0.0.2.0
 newtype ConfigRoot rootType fieldModifier a = ConfigRoot {unConfigRoot :: a}
 
 class (KeyModifier t) => GetConfigOptions t where
@@ -50,13 +57,14 @@ instance (KeyModifier (ConstructorName k), KeyModifier f) => ConfigRootOptions (
   configRootOptions = RootOptions (ConstructorName $ getKeyModifier @(ConstructorName k)) (getKeyModifier @f)
 
 -- Source
-instance (AssertTopLevelRecord ConfigSource a, Generic a, GConfigSource (Rep a)) => ConfigSource (Config a) where
+instance (AssertTopLevelRecord ConfigSource a, DefaultSource a, Generic a, GConfigSource (Rep a)) => ConfigSource (Config a) where
   configSource = defaultConfigSource @a defaultConfigOptions
 
 instance
   ( GetConfigOptions t
   , AssertTopLevelRecord ConfigSource a
   , Generic a
+  , DefaultSource a
   , GConfigSource (Rep a)
   )
   => ConfigSource (ConfigOpts t a)
@@ -67,6 +75,7 @@ instance
   ( ConfigRootOptions r f
   , AssertTopLevelRecord ConfigSource a
   , Generic a
+  , DefaultSource a
   , GConfigSource (Rep a)
   )
   => ConfigSource (ConfigRoot r f a)

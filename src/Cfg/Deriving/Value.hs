@@ -6,8 +6,11 @@ import Cfg.Parser
 import Cfg.Parser.Value
 import Data.Coerce
 import GHC.Generics
+import GHC.TypeLits (Symbol)
 
-newtype Value a = Value {unConfigValue :: a}
+-- | TODO: document
+-- @since 0.0.2.0
+newtype Value a = Value {unValue :: a}
 
 instance (Generic a) => Generic (Value a) where
   type Rep (Value a) = Rep a
