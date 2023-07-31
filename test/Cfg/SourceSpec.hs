@@ -11,6 +11,7 @@ import Test.Hspec
 import Data.Map.Strict (fromList, empty, singleton)
 import Cfg.Options
 import Cfg.Source.Default
+import Cfg.Parser
 
 spec :: Spec
 spec = do

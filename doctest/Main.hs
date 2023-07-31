@@ -1,0 +1,41 @@
+module Main where
+
+import Test.DocTest
+
+main :: IO ()
+main = doctest
+  [ "-isrc/"
+  , "--fast"
+  ,  "-XAllowAmbiguousTypes"
+  ,  "-XBlockArguments"
+  ,  "-XConstraintKinds"
+  ,  "-XDataKinds"
+  ,  "-XDeriveAnyClass"
+  ,  "-XDeriveFunctor"
+  ,  "-XDeriveGeneric"
+  ,  "-XDerivingStrategies"
+  ,  "-XDerivingVia"
+  ,  "-XEmptyCase"
+  ,  "-XFlexibleContexts"
+  ,  "-XFlexibleInstances"
+  ,  "-XGADTs"
+  ,  "-XGeneralizedNewtypeDeriving"
+  ,  "-XImportQualifiedPost"
+  ,  "-XInstanceSigs"
+  ,  "-XKindSignatures"
+  ,  "-XLambdaCase"
+  ,  "-XMultiParamTypeClasses"
+  ,  "-XMultiWayIf"
+  ,  "-XNamedFieldPuns"
+  ,  "-XNumericUnderscores"
+  ,  "-XOverloadedStrings"
+  ,  "-XRecordWildCards"
+  ,  "-XScopedTypeVariables"
+  ,  "-XStandaloneDeriving"
+  ,  "-XTupleSections"
+  ,  "-XTypeApplications"
+  ,  "-XTypeFamilies"
+  ,  "-XTypeOperators"
+  , "src/Cfg.hs"
+  , "src/Cfg/Env/Keys.hs"
+  ]

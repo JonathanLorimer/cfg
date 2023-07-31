@@ -6,7 +6,6 @@ import Cfg.Parser
 import Cfg.Parser.Value
 import Data.Coerce
 import GHC.Generics
-import GHC.TypeLits (Symbol)
 
 -- | TODO: document
 -- @since 0.0.2.0

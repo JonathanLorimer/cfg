@@ -122,3 +122,16 @@ test-suite cfg-tests
     , hspec-discover      >=2.9.7 && <2.10
     , hspec-expectations  >=0.8.2 && <0.9
     , hspec-hedgehog      >=0.0.1 && <0.1
+
+test-suite documentation
+  import:         common-opts
+  type:           exitcode-stdio-1.0
+  hs-source-dirs: doctest
+  ghc-options:
+    -Wall -threaded -rtsopts -with-rtsopts=-N
+
+  main-is:        Main.hs
+
+  build-depends:
+    , cfg
+    , doctest
