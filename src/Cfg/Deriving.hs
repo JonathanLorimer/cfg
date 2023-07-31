@@ -6,5 +6,5 @@ module Cfg.Deriving
 where
 
 import Cfg.Deriving.Config
-import Cfg.Deriving.Value
 import Cfg.Deriving.KeyModifier
+import Cfg.Deriving.Value

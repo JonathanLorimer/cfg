@@ -3,16 +3,16 @@ module Cfg.Env where
 import Cfg
 import Cfg.Env.Keys
 import Cfg.Parser
+import Cfg.Source
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.List (intersperse)
+import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import Data.Text qualified as T
 import Data.Text.IO (writeFile)
+import KeyTree
 import System.Environment (lookupEnv)
 import Prelude hiding (writeFile)
-import KeyTree
-import Data.Maybe (fromMaybe)
-import Cfg.Source
 
 -- | @since 0.0.1.0
 envSourceSep
@@ -21,19 +21,19 @@ envSourceSep
   => Text
   -> KeyTree Text Text
   -> m (KeyTree Text Text)
-envSourceSep sep =  mayAppendTraverse valF accF stepF []
-  where
-    valF :: [Text] -> Text -> m Text
-    valF keys def = fromMaybe def <$> accF keys
-      
-    accF :: [Text] -> m (Maybe Text)
-    accF = fmap (fmap T.pack) . liftIO . lookupEnv . T.unpack . mkKey
+envSourceSep sep = mayAppendTraverse valF accF stepF []
+ where
+  valF :: [Text] -> Text -> m Text
+  valF keys def = fromMaybe def <$> accF keys
 
-    stepF :: Text -> [Text] -> KeyForest Text Text -> [Text]
-    stepF key acc _ = key : acc
+  accF :: [Text] -> m (Maybe Text)
+  accF = fmap (fmap T.pack) . liftIO . lookupEnv . T.unpack . mkKey
 
-    mkKey :: [Text] -> Text
-    mkKey keys = foldr (flip mappend) "" $ intersperse sep keys
+  stepF :: Text -> [Text] -> KeyForest Text Text -> [Text]
+  stepF key acc _ = key : acc
+
+  mkKey :: [Text] -> Text
+  mkKey keys = foldr (flip mappend) "" $ intersperse sep keys
 
 -- | @since 0.0.1.0
 envSource :: (MonadFail m, MonadIO m) => KeyTree Text Text -> m (KeyTree Text Text)

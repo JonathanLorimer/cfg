@@ -437,7 +437,6 @@ data AppConfig3 = AppConfig3
     via (ConfigOpts [StripPrefix "appConfig", StripSuffix "Settings", ToUpper] AppConfig3)
 
 -- Example 4
---
 data AppConfig4 = AppConfig4
   { appConfigWarpSettings :: WarpConfig3
   , appConfigRedisSettings :: RedisConfig3
@@ -451,11 +450,3 @@ data AppConfig4 = AppConfig4
         [StripPrefix "appConfig", StripSuffix "Settings", ToUpper] 
         AppConfig4
     )
-
--- $> import Cfg
---
--- $> import Text.Pretty.Simple
---
--- $> import Cfg.Env.Keys
---
--- $> pPrint $ showEnvKeys @AppConfig4 "_"

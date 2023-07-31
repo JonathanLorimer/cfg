@@ -17,12 +17,12 @@ data RootOptions = RootOptions
   }
 
 defaultRootOptions :: RootOptions
-defaultRootOptions = RootOptions (TypeName id) id 
+defaultRootOptions = RootOptions (TypeName id) id
 
 data ConfigOptions = Root RootOptions | Key KeyOptions
 
 defaultConfigOptions :: ConfigOptions
-defaultConfigOptions = Key defaultKeyOptions 
+defaultConfigOptions = Key defaultKeyOptions
 
 keyModifier :: ConfigOptions -> (Text -> Text)
 keyModifier (Root options) = rootOptionsModifier options

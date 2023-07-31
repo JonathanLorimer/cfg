@@ -1,17 +1,17 @@
 module Cfg.SourceSpec where
 
 import Cfg.Deriving.Config
-import Cfg.Deriving.Value
 import Cfg.Deriving.KeyModifier
-import Cfg.Source
-import Data.Text (Text)
-import KeyTree
-import GHC.Generics (Generic (..))
-import Test.Hspec
-import Data.Map.Strict (fromList, empty, singleton)
+import Cfg.Deriving.Value
 import Cfg.Options
-import Cfg.Source.Default
 import Cfg.Parser
+import Cfg.Source
+import Cfg.Source.Default
+import Data.Map.Strict (empty, fromList, singleton)
+import Data.Text (Text)
+import GHC.Generics (Generic (..))
+import KeyTree
+import Test.Hspec
 
 spec :: Spec
 spec = do
@@ -19,49 +19,63 @@ spec = do
     it "should create a tree from the sample config" $ do
       let
         expected =
-          Free $ fromList
-            [ ("key1", Free empty)
-            , ("key2", Free $ fromList
-                [ ("subKey1", Free empty)
-                , ("subKey2", Free empty)
-                , ("subKey3", Free empty)
-                ]
-              )
-            , ("key3", Free empty)
-            , ("key4", Free empty)
-            ]
+          Free $
+            fromList
+              [ ("key1", Free empty)
+              ,
+                ( "key2"
+                , Free $
+                    fromList
+                      [ ("subKey1", Free empty)
+                      , ("subKey2", Free empty)
+                      , ("subKey3", Free empty)
+                      ]
+                )
+              , ("key3", Free empty)
+              , ("key4", Free empty)
+              ]
       configSource @(RootTyCon Text) `shouldBe` expected
     it "should create a tree with modified options from sample config" $ do
       let
         expected =
-          Free $ singleton "ROOTTYCONOPTS" $
-          Free $ fromList
-              [ ("keyopts1", Free empty)
-              , ("keyopts2", Free $ fromList
-                  [ ("SUBKEYOPTS1", Free empty)
-                  , ("SUBKEYOPTS2", Free empty)
-                  , ("SUBKEYOPTS3", Free empty)
+          Free $
+            singleton "ROOTTYCONOPTS" $
+              Free $
+                fromList
+                  [ ("keyopts1", Free empty)
+                  ,
+                    ( "keyopts2"
+                    , Free $
+                        fromList
+                          [ ("SUBKEYOPTS1", Free empty)
+                          , ("SUBKEYOPTS2", Free empty)
+                          , ("SUBKEYOPTS3", Free empty)
+                          ]
+                    )
+                  , ("keyopts3", Free empty)
+                  , ("keyopts4", Free empty)
                   ]
-                )
-              , ("keyopts3", Free empty)
-              , ("keyopts4", Free empty)
-              ]
       configSource @(RootTyConOpts Text) `shouldBe` expected
     it "should create a tree with modified options from sample config AND respect defaults" $ do
       let
         expected =
-          Free $ singleton "ROOTTYCONOPTSDEF" $
-          Free $ fromList
-              [ ("keyoptsdef1", Pure "Case1")
-              , ("keyoptsdef2", Free $ fromList
-                  [ ("SUBKEYOPTS1", Free empty)
-                  , ("SUBKEYOPTS2", Free empty)
-                  , ("SUBKEYOPTS3", Free empty)
+          Free $
+            singleton "ROOTTYCONOPTSDEF" $
+              Free $
+                fromList
+                  [ ("keyoptsdef1", Pure "Case1")
+                  ,
+                    ( "keyoptsdef2"
+                    , Free $
+                        fromList
+                          [ ("SUBKEYOPTS1", Free empty)
+                          , ("SUBKEYOPTS2", Free empty)
+                          , ("SUBKEYOPTS3", Free empty)
+                          ]
+                    )
+                  , ("keyoptsdef3", Free empty)
+                  , ("keyoptsdef4", Free empty)
                   ]
-                )
-              , ("keyoptsdef3", Free empty)
-              , ("keyoptsdef4", Free empty)
-              ]
       configSource @(RootTyConOptsDef Text) `shouldBe` expected
 
 data SumTypeConfig = Case1 | Case2

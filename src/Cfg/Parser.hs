@@ -5,9 +5,10 @@ module Cfg.Parser where
 import Control.Error (note)
 import Data.ByteString qualified as BS
 import Data.ByteString.Lazy qualified as BL
-import Data.Functor (void) 
+import Data.Functor (void)
 import Data.Int
 import Data.List.NonEmpty (NonEmpty, fromList)
+import Data.Map.Strict qualified as M
 import Data.Text (Text)
 import Data.Text qualified as T
 import Data.Text.Encoding (encodeUtf8)
@@ -15,6 +16,7 @@ import Data.Text.Lazy qualified as TL
 import Data.Void (Void)
 import Data.Word
 import GHC.Generics (Generic)
+import KeyTree
 import Text.Megaparsec
   ( Parsec
   , anySingle
@@ -31,8 +33,6 @@ import Text.Megaparsec
   )
 import Text.Megaparsec.Char (char, digitChar, space1, string, string')
 import Text.Megaparsec.Char.Lexer qualified as L
-import KeyTree
-import qualified Data.Map.Strict as M
 
 type Parser = Parsec Void Text
 
@@ -124,10 +124,10 @@ instance (ValueParser a) => ConfigParser (NonEmpty a)
 
 -- | @since 0.0.1.0
 instance (ValueParser a) => ConfigParser (Maybe a) where
-  parseConfig (Free m) = 
-    if m == M.empty 
-       then Right Nothing 
-       else Left $ ExpectedValueFoundForest (Free m)
+  parseConfig (Free m) =
+    if m == M.empty
+      then Right Nothing
+      else Left $ ExpectedValueFoundForest (Free m)
   parseConfig (Pure v) = Just <$> note (ValueParseError v) (parseMaybe (parser @a) v)
 
 -- Numeric Types

@@ -1,16 +1,16 @@
 module Cfg.Source where
 
+import Cfg.Deriving.Value (Value)
 import Data.ByteString qualified as BS
 import Data.ByteString.Lazy qualified as BL
-import Data.Int ( Int8, Int16, Int32, Int64 )
-import Data.List.NonEmpty ( NonEmpty )
+import Data.Int (Int16, Int32, Int64, Int8)
+import Data.List.NonEmpty (NonEmpty)
+import Data.Map.Strict (empty)
 import Data.Text (Text)
 import Data.Text.Lazy qualified as TL
 import Data.Vector (Vector)
-import Data.Word ( Word8, Word16, Word32, Word64 )
-import KeyTree ( KeyTree, Free(..) )
-import Data.Map.Strict ( empty )
-import Cfg.Deriving.Value (Value)
+import Data.Word (Word16, Word32, Word64, Word8)
+import KeyTree (Free (..), KeyTree)
 
 -- | @since 0.0.1.0
 type FetchSource m = KeyTree Text Text -> m (KeyTree Text Text)
@@ -22,7 +22,6 @@ class ConfigSource a where
 -- | @since 0.0.1.0
 instance ConfigSource (Value a) where
   configSource = Free empty
-
 
 -- | @since 0.0.1.0
 deriving via (Value ()) instance ConfigSource ()
