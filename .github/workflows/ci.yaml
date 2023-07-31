@@ -17,6 +17,7 @@ jobs:
       run: nix build .
 
   flake-check:
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       - name: Check Nix flake Nixpkgs inputs
