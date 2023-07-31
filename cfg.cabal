@@ -59,6 +59,7 @@ common common-opts
   build-depends:
     , base           >=4.18.0 && <4.19
     , containers     >=0.6.7  && <0.7
+    , free           >=5.1.10 && <5.2
     , mtl            >=2.3.1  && <2.4
     , pretty-simple  >=4.1.2  && <4.2
     , text           >=2.0.2  && <2.1
@@ -78,20 +79,19 @@ library
     Cfg
     Cfg.Deriving
     Cfg.Deriving.Assert
-    Cfg.Deriving.ConfigRoot
-    Cfg.Deriving.ConfigValue
-    Cfg.Deriving.LabelModifier
-    Cfg.Deriving.SubConfig
+    Cfg.Deriving.Config
+    Cfg.Deriving.KeyModifier
+    Cfg.Deriving.Value
     Cfg.Env
     Cfg.Env.Keys
     Cfg.Options
     Cfg.Parser
-    Cfg.Parser.ConfigParser
-    Cfg.Parser.ValueParser
+    Cfg.Parser.Config
+    Cfg.Parser.Value
     Cfg.Source
-    Cfg.Source.NestedConfig
-    Cfg.Source.RootConfig
-    Tree.Append
+    Cfg.Source.Config
+    Cfg.Source.Default
+    KeyTree
 
   hs-source-dirs:  src
   ghc-options:     -Wall -fdefer-typed-holes
@@ -107,7 +107,8 @@ test-suite cfg-tests
 
   -- cabal-fmt: expand test -Main
   other-modules:
-    Cfg.Deriving.LabelModifierSpec
+    Cfg.Deriving.KeyModifierSpec
+    Cfg.Env.KeysSpec
     Cfg.EnvSpec
     Cfg.ParserSpec
     Cfg.SourceSpec
@@ -121,3 +122,16 @@ test-suite cfg-tests
     , hspec-discover      >=2.9.7 && <2.10
     , hspec-expectations  >=0.8.2 && <0.9
     , hspec-hedgehog      >=0.0.1 && <0.1
+
+test-suite documentation
+  import:         common-opts
+  type:           exitcode-stdio-1.0
+  hs-source-dirs: doctest
+  ghc-options:
+    -Wall -threaded -rtsopts -with-rtsopts=-N
+
+  main-is:        Main.hs
+
+  build-depends:
+    , cfg
+    , doctest

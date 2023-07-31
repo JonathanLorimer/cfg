@@ -3,53 +3,60 @@ module Cfg.Env where
 import Cfg
 import Cfg.Env.Keys
 import Cfg.Parser
-import Cfg.Source (RootConfig, toRootConfig)
+import Cfg.Source
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.List (intersperse)
+import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import Data.Text qualified as T
 import Data.Text.IO (writeFile)
-import Data.Tree (Tree)
+import KeyTree
 import System.Environment (lookupEnv)
-import Tree.Append (mayAppendLeafA')
 import Prelude hiding (writeFile)
 
 -- | @since 0.0.1.0
 envSourceSep
   :: forall m
-   . (MonadFail m, MonadIO m)
+   . (MonadIO m)
   => Text
-  -> Tree Text
-  -> m (Tree Text)
-envSourceSep sep = mayAppendLeafA' getLeafFromEnv []
+  -> KeyTree Text Text
+  -> m (KeyTree Text Text)
+envSourceSep sep = mayAppendTraverse valF accF stepF []
  where
-  getLeafFromEnv :: [Text] -> m (Maybe Text)
-  getLeafFromEnv keys = do
-    let
-      key = foldr (flip mappend) "" $ intersperse sep keys
+  valF :: [Text] -> Text -> m Text
+  valF keys def = fromMaybe def <$> accF keys
 
-    liftIO $ (fmap T.pack) <$> (lookupEnv $ T.unpack key)
+  accF :: [Text] -> m (Maybe Text)
+  accF = fmap (fmap T.pack) . liftIO . lookupEnv . T.unpack . mkKey
+
+  stepF :: Text -> [Text] -> KeyForest Text Text -> [Text]
+  stepF key acc _ = key : acc
+
+  mkKey :: [Text] -> Text
+  mkKey keys = foldr (flip mappend) "" $ intersperse sep keys
 
 -- | @since 0.0.1.0
-envSource :: (MonadFail m, MonadIO m) => Tree Text -> m (Tree Text)
+envSource :: (MonadFail m, MonadIO m) => KeyTree Text Text -> m (KeyTree Text Text)
 envSource = envSourceSep "_"
 
 -- | @since 0.0.1.0
-printDotEnv' :: FilePath -> Text -> Tree Text -> IO ()
+printDotEnv' :: FilePath -> Text -> KeyTree Text Text -> IO ()
 printDotEnv' path sep = writeFile path . foldMap (\line -> "export " <> line <> "=\n") . showEnvKeys' sep
 
 -- | @since 0.0.1.0
-getEnvConfigSep :: (MonadFail m, MonadIO m, RootConfig a, RootParser a) => Text -> m (Either ConfigParseError a)
+getEnvConfigSep
+  :: (MonadFail m, MonadIO m, ConfigSource a, ConfigParser a) => Text -> m (Either ConfigParseError a)
 getEnvConfigSep sep = getConfig $ envSourceSep sep
 
 -- | @since 0.0.1.0
-getEnvConfig :: (MonadFail m, MonadIO m, RootConfig a, RootParser a) => m (Either ConfigParseError a)
+getEnvConfig
+  :: (MonadFail m, MonadIO m, ConfigSource a, ConfigParser a) => m (Either ConfigParseError a)
 getEnvConfig = getConfig $ envSource
 
 -- | @since 0.0.1.0
-printDotEnv :: forall a. (RootConfig a) => FilePath -> IO ()
+printDotEnv :: forall a. (ConfigSource a) => FilePath -> IO ()
 printDotEnv path =
   writeFile path
     . foldMap (\line -> "export " <> line <> "=\n")
     . showEnvKeys' "_"
-    $ toRootConfig @a
+    $ configSource @a

@@ -4,5 +4,7 @@ cradle:
       component: "lib:cfg"
     - path: "./test"
       component: "test:cfg-tests"
+    - path: "./doctest"
+      component: "test:documentation"
     - path: "./app"
       component: "exe:cfg"

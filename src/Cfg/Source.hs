@@ -1,102 +1,99 @@
 module Cfg.Source where
 
-import Cfg.Deriving.ConfigValue (ConfigValue)
+import Cfg.Deriving.Value (Value)
 import Data.ByteString qualified as BS
 import Data.ByteString.Lazy qualified as BL
-import Data.Int
-import Data.List.NonEmpty
+import Data.Int (Int16, Int32, Int64, Int8)
+import Data.List.NonEmpty (NonEmpty)
+import Data.Map.Strict (empty)
 import Data.Text (Text)
 import Data.Text.Lazy qualified as TL
-import Data.Tree (Tree)
-import Data.Vector
-import Data.Word
+import Data.Vector (Vector)
+import Data.Word (Word16, Word32, Word64, Word8)
+import KeyTree (Free (..), KeyTree)
 
 -- | @since 0.0.1.0
-type FetchSource m = Tree Text -> m (Tree Text)
+type FetchSource m = KeyTree Text Text -> m (KeyTree Text Text)
 
 -- | @since 0.0.1.0
-class RootConfig a where
-  toRootConfig :: Tree Text
+class ConfigSource a where
+  configSource :: KeyTree Text Text
 
 -- | @since 0.0.1.0
-class NestedConfig a where
-  toNestedConfig :: [Tree Text]
+instance ConfigSource (Value a) where
+  configSource = Free empty
 
 -- | @since 0.0.1.0
-instance NestedConfig (ConfigValue a) where
-  toNestedConfig = []
+deriving via (Value ()) instance ConfigSource ()
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue ()) instance NestedConfig ()
+deriving via (Value Bool) instance ConfigSource Bool
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Bool) instance NestedConfig Bool
+deriving via (Value Char) instance ConfigSource Char
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Char) instance NestedConfig Char
+deriving via (Value TL.Text) instance ConfigSource TL.Text
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue TL.Text) instance NestedConfig TL.Text
+deriving via (Value BL.ByteString) instance ConfigSource BL.ByteString
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue BL.ByteString) instance NestedConfig BL.ByteString
+deriving via (Value BS.ByteString) instance ConfigSource BS.ByteString
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue BS.ByteString) instance NestedConfig BS.ByteString
+deriving via (Value Text) instance ConfigSource Text
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Text) instance NestedConfig Text
+deriving via (Value [a]) instance ConfigSource [a]
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue [a]) instance NestedConfig [a]
+deriving via (Value (NonEmpty a)) instance ConfigSource (NonEmpty a)
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue (NonEmpty a)) instance NestedConfig (NonEmpty a)
+deriving via (Value (Vector a)) instance ConfigSource (Vector a)
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue (Vector a)) instance NestedConfig (Vector a)
+deriving via (Value (Maybe a)) instance ConfigSource (Maybe a)
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue (Maybe a)) instance NestedConfig (Maybe a)
+deriving via (Value Double) instance ConfigSource Double
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Double) instance NestedConfig Double
+deriving via (Value Float) instance ConfigSource Float
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Float) instance NestedConfig Float
+deriving via (Value Int) instance ConfigSource Int
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Int) instance NestedConfig Int
+deriving via (Value Int8) instance ConfigSource Int8
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Int8) instance NestedConfig Int8
+deriving via (Value Int16) instance ConfigSource Int16
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Int16) instance NestedConfig Int16
+deriving via (Value Int32) instance ConfigSource Int32
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Int32) instance NestedConfig Int32
+deriving via (Value Int64) instance ConfigSource Int64
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Int64) instance NestedConfig Int64
+deriving via (Value Integer) instance ConfigSource Integer
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Integer) instance NestedConfig Integer
+deriving via (Value Word) instance ConfigSource Word
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Word) instance NestedConfig Word
+deriving via (Value Word8) instance ConfigSource Word8
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Word8) instance NestedConfig Word8
+deriving via (Value Word16) instance ConfigSource Word16
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Word16) instance NestedConfig Word16
+deriving via (Value Word32) instance ConfigSource Word32
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Word32) instance NestedConfig Word32
+deriving via (Value Word64) instance ConfigSource Word64
 
 -- | @since 0.0.1.0
-deriving via (ConfigValue Word64) instance NestedConfig Word64
-
--- | @since 0.0.1.0
-deriving via (ConfigValue (a, b)) instance NestedConfig (a, b)
+deriving via (Value (a, b)) instance ConfigSource (a, b)
