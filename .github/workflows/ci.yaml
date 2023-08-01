@@ -17,6 +17,7 @@ jobs:
       run: nix build .
 
   flake-check:
+    name: Check Flake
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
@@ -31,6 +32,8 @@ jobs:
     - uses: DeterminateSystems/nix-installer-action@main
     - uses: DeterminateSystems/magic-nix-cache-action@main
     - name: Run library tests
-      run: nix develop -c tst 
+      run: nix develop .#ci -c tst 
     - name: Run doc tests
-      run: nix develop -c dtst 
+      run: nix develop .#ci -c dtst 
+    - name: check formatting
+      run: nix develop .#ci -c format-check 
