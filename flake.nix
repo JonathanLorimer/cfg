@@ -34,25 +34,38 @@
       formatter = forAllSystems ({pkgs, ...}: pkgs.alejandra);
 
       # nix develop
-      devShell = forAllSystems ({hsPkgs, pkgs, system, ...}:
-        hsPkgs.shellFor {
-          # withHoogle = true;
-          packages = p: [
-            p.cfg
-          ];
-          buildInputs = with pkgs;
-            [
-              hsPkgs.haskell-language-server
-              haskellPackages.cabal-install
-              cabal2nix
-              haskellPackages.ghcid
-              hsPkgs.fourmolu_0_13_0_0
-              haskellPackages.cabal-fmt
-              nodePackages_latest.serve
-              hsPkgs.doctest_0_21_1
-            ]
-            ++ (builtins.attrValues (import ./scripts.nix {s = pkgs.writeShellScriptBin;}));
-        });
+      devShells = forAllSystems ({hsPkgs, pkgs, system, ...}: {
+        default = 
+          hsPkgs.shellFor {
+            packages = p: [
+              p.cfg
+            ];
+            buildInputs = with pkgs;
+              [
+                hsPkgs.haskell-language-server
+                haskellPackages.cabal-install
+                cabal2nix
+                haskellPackages.ghcid
+                hsPkgs.fourmolu_0_13_0_0
+                haskellPackages.cabal-fmt
+                nodePackages_latest.serve
+                hsPkgs.doctest_0_21_1
+              ]
+              ++ (builtins.attrValues (import ./scripts.nix {s = pkgs.writeShellScriptBin;}));
+        };
+        ci =
+          hsPkgs.shellFor {
+            packages = p: [
+              p.cfg
+            ];
+            buildInputs = with pkgs;
+              [
+                haskellPackages.cabal-install
+                hsPkgs.fourmolu_0_13_0_0
+              ]
+              ++ (builtins.attrValues (import ./scripts.nix {s = pkgs.writeShellScriptBin;}));
+        };
+      });
 
       # nix build
       packages = forAllSystems ({hsPkgs, ...}: {

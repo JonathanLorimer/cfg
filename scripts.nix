@@ -6,5 +6,6 @@
   doctestScript = s "dtst" "cabal run test:documentation";
   replScript = s "repl" "cabal new-repl lib:cfg";
   formatScript = s "format" "fourmolu -i ./{src,test}/**/*.hs";
+  formatCheckScript = s "format-check" "fourmolu --mode check ./{src,test}/**/*.hs";
   hoogleScript = s "hgl" "hoogle serve";
 }

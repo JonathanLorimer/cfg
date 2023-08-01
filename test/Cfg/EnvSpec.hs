@@ -6,6 +6,7 @@ import Data.Text (Text)
 import KeyTree
 import System.Environment (setEnv, unsetEnv)
 import Test.Hspec
+import Test.Hspec.Core.Spec (sequential)
 
 spec :: Spec
 spec = around
@@ -18,6 +19,7 @@ spec = around
       unsetEnv "A_C"
       unsetEnv "A_D"
   )
+  $ sequential
   $ describe "envSource"
   $ do
     it "should get variables from environment" $ do
