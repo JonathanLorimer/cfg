@@ -2,9 +2,9 @@ module Cfg.Env.Keys where
 
 import Cfg.Source (ConfigSource (..))
 import Data.List (intersperse)
+import Data.Map.Strict (empty)
 import Data.Text (Text)
 import KeyTree
-import Data.Map.Strict (empty)
 
 -- | @since 0.0.1.0
 getEnvKey :: Text -> [Text] -> Text
@@ -17,9 +17,9 @@ getKeys = foldKeyTree valF stepF []
   stepF :: Text -> Free (Map Text) Text -> [[Text]] -> [[Text]]
   stepF key (Pure _) acc = [key] : acc
   stepF key t@(Free m) acc =
-    if m == empty 
-       then [key] : acc
-       else fmap (key :) (getKeys t) <> acc
+    if m == empty
+      then [key] : acc
+      else fmap (key :) (getKeys t) <> acc
 
   valF :: Text -> [[Text]]
   valF _ = []

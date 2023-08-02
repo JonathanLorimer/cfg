@@ -3,6 +3,7 @@
 
 module Cfg.Deriving.KeyModifier where
 
+import Cfg.Options (RootKey (..))
 import Data.Char (isLower, isUpper, toLower, toUpper)
 import Data.Data (Proxy (..))
 import Data.Functor
@@ -10,7 +11,8 @@ import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import Data.Text qualified as T
 import GHC.TypeLits
-import Cfg.Options (RootKey (..))
+
+data Identity
 
 data ToLower
 
@@ -34,11 +36,17 @@ type CamelToKebab = CamelTo '-'
 class KeyModifier t where
   getKeyModifier :: Text -> Text
 
-instance KeyModifier k => KeyModifier ('TypeName k) where
+instance (KeyModifier k) => KeyModifier ('TypeName k) where
   getKeyModifier = getKeyModifier @k
 
-instance KeyModifier k => KeyModifier ('ConstructorName k) where
+instance (KeyModifier k) => KeyModifier ('ConstructorName k) where
   getKeyModifier = getKeyModifier @k
+
+instance KeyModifier Identity where
+  getKeyModifier = id
+
+instance KeyModifier '() where
+  getKeyModifier = id
 
 instance KeyModifier '[] where
   getKeyModifier = id

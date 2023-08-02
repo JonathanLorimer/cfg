@@ -6,5 +6,3 @@ import Data.Text (Text)
 class DefaultSource a where
   defaults :: Text -> Maybe Text
   defaults = const Nothing
-
-

@@ -1,4 +1,5 @@
 {-# LANGUAGE DuplicateRecordFields #-}
+
 -- |
 --  Module      : Cfg
 --  Copyright   : © Jonathan Lorimer, 2023
@@ -20,6 +21,7 @@
 -- intention is that other packages will provide additional sources.
 module Cfg
   ( -- * Concepts
+
     -- |
     --
     -- The core concepts in this package are:
@@ -53,6 +55,7 @@ module Cfg
     --    "Cfg.Deriving".
 
     -- * Quickstart guide
+
     -- |
     --
     -- Here we will introduce some sample code that should get you up and running
@@ -60,6 +63,7 @@ module Cfg
     -- things are wired together
 
     -- ** Initial configuration
+
     -- |
     --
     -- Let's start out with a couple types that represent some imaginary
@@ -89,7 +93,7 @@ module Cfg
     --   deriving (Generic, Show, 'DefaultSource')
     --   deriving ('ConfigSource', 'ValueParser') via ('Value' Environment)
     --   -- Note: This is derivable via ConigParser's default instance, because we provided a ValueParser instance
-    --   deriving ('ConfigParser') 
+    --   deriving ('ConfigParser')
     --
     -- data WarpConfig = WarpConfig
     --   { warpConfigPort :: Int
@@ -132,8 +136,9 @@ module Cfg
     -- , "appConfigWarpSettings_warpConfigServerName"
     -- , "appConfigWarpSettings_warpConfigTimeout"
     -- ]
-    
+
     -- ** Basic key modifiers
+
     -- |
     --
     -- This is okay, but there are some changes we may want to make. We will go
@@ -172,8 +177,9 @@ module Cfg
     -- , "APPCONFIGWARPSETTINGS_WARPCONFIGSERVERNAME"
     -- , "APPCONFIGWARPSETTINGS_WARPCONFIGTIMEOUT"
     -- ]
-    
+
     -- ** Multiple key modifiers
+
     -- |
     --
     -- This is close, but we probably want to remove the record field suffixes
@@ -205,7 +211,7 @@ module Cfg
     --   , appConfigEnvironment :: Environment
     --   }
     --   deriving (Generic, Show, 'DefaultSource')
-    --   deriving ('ConfigSource', 'ConfigParser') 
+    --   deriving ('ConfigSource', 'ConfigParser')
     --    via ('ConfigOpts' ['StripPrefix' "appConfig", 'StripSuffix' \"Settings\", ToUpper] AppConfig)
     -- @
     --
@@ -222,8 +228,9 @@ module Cfg
     -- , "WARP_SERVERNAME"
     -- , "WARP_TIMEOUT"
     -- ]
-    
+
     -- ** Root key
+
     -- |
     --
     -- This is much better, but we might even want to go a step further and
@@ -237,11 +244,11 @@ module Cfg
     --   , appConfigEnvironment :: Environment
     --   }
     -- deriving (Generic, Show, 'DefaultSource')
-    -- deriving ('ConfigSource', 'ConfigParser') 
+    -- deriving ('ConfigSource', 'ConfigParser')
     --   via (
-    --     'ConfigRoot' 
-    --       (''TypeName' ['StripSuffix' "Config", 'ToUpper']) 
-    --       ['StripPrefix' "appConfig", 'StripSuffix' \"Settings\", 'ToUpper'] 
+    --     'ConfigRoot'
+    --       (''TypeName' ['StripSuffix' "Config", 'ToUpper'])
+    --       ['StripPrefix' "appConfig", 'StripSuffix' \"Settings\", 'ToUpper']
     --       AppConfig
     --   )
     -- @
@@ -263,8 +270,9 @@ module Cfg
     -- , "APP_WARP_SERVERNAME"
     -- , "APP_WARP_TIMEOUT"
     -- ]
-    
+
     -- ** Defaults
+
     -- |
     --
     -- The defaulting machinery is admittedly a bit crude. You must define a
@@ -305,7 +313,7 @@ module Cfg
     --   , appConfigEnvironment :: Environment
     --   }
     --   deriving (Generic, Show)
-    --   deriving ('ConfigSource', 'ConfigParser') 
+    --   deriving ('ConfigSource', 'ConfigParser')
     --    via ('ConfigOpts' ['StripPrefix' "appConfig", 'StripSuffix' \"Settings\", ToUpper] AppConfig)
     --
     -- -- NOTE: If I provide a default for WarpConfig or RedisConfig this will break the configuration machinery
@@ -322,20 +330,19 @@ module Cfg
   )
 where
 
-import Cfg.Parser 
-import Data.Text (Text)
-import KeyTree
-import Cfg.Source
 -- Haddock example imports
-import Cfg.Deriving.Config 
-import Cfg.Deriving.Value
-import Cfg.Parser ()
-import Cfg.Source ()
-import Data.ByteString (ByteString)
-import GHC.Generics
-import Cfg.Source.Default
+
 import Cfg.Deriving
 import Cfg.Options
+import Cfg.Parser
+import Cfg.Parser ()
+import Cfg.Source
+import Cfg.Source ()
+import Cfg.Source.Default
+import Data.ByteString (ByteString)
+import Data.Text (Text)
+import GHC.Generics
+import KeyTree
 
 -- | @since 0.0.1.0
 getConfigRaw
@@ -348,7 +355,10 @@ getConfigRaw keyTree source parse = parse <$> source keyTree
 
 -- | @since 0.0.1.0
 getConfig
-  :: forall a m. (Monad m, ConfigSource a, ConfigParser a) => FetchSource m -> m (Either ConfigParseError a)
+  :: forall a m
+   . (Monad m, ConfigSource a, ConfigParser a)
+  => FetchSource m
+  -> m (Either ConfigParseError a)
 getConfig fetch = parseConfig @a <$> fetch (configSource @a)
 
 -------------------------------------------------------
@@ -420,7 +430,9 @@ data WarpConfig3 = WarpConfig3
   , warpConfigServerName :: ByteString
   }
   deriving (Generic, Show, DefaultSource)
-  deriving (ConfigSource, ConfigParser) via (ConfigOpts (StripPrefix "warpConfig", ToUpper) WarpConfig3)
+  deriving
+    (ConfigSource, ConfigParser)
+    via (ConfigOpts (StripPrefix "warpConfig", ToUpper) WarpConfig3)
 
 data RedisConfig3 = RedisConfig3
   { redisConfigHost :: Text
@@ -428,7 +440,9 @@ data RedisConfig3 = RedisConfig3
   , redisConfigConnectAuth :: Maybe ByteString
   }
   deriving (Generic, Show, DefaultSource)
-  deriving (ConfigSource, ConfigParser) via (ConfigOpts [StripPrefix "redisConfig", ToUpper] RedisConfig3)
+  deriving
+    (ConfigSource, ConfigParser)
+    via (ConfigOpts [StripPrefix "redisConfig", ToUpper] RedisConfig3)
 
 data AppConfig3 = AppConfig3
   { appConfigWarpSettings :: WarpConfig3
@@ -436,7 +450,8 @@ data AppConfig3 = AppConfig3
   , appConfigEnvironment :: Environment
   }
   deriving (Generic, Show, DefaultSource)
-  deriving (ConfigSource, ConfigParser) 
+  deriving
+    (ConfigSource, ConfigParser)
     via (ConfigOpts [StripPrefix "appConfig", StripSuffix "Settings", ToUpper] AppConfig3)
 
 -- Example 4
@@ -446,10 +461,10 @@ data AppConfig4 = AppConfig4
   , appConfigEnvironment :: Environment
   }
   deriving (Generic, Show, DefaultSource)
-  deriving (ConfigSource, ConfigParser) 
-    via (
-      ConfigRoot 
-        ('TypeName [StripSuffix "Config4", ToUpper]) 
-        [StripPrefix "appConfig", StripSuffix "Settings", ToUpper] 
-        AppConfig4
-    )
+  deriving
+    (ConfigSource, ConfigParser)
+    via ( ConfigRoot
+            ('TypeName [StripSuffix "Config4", ToUpper])
+            [StripPrefix "appConfig", StripSuffix "Settings", ToUpper]
+            AppConfig4
+        )

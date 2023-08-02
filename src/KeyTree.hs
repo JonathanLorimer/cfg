@@ -1,14 +1,15 @@
-module KeyTree (
-  foldKeyTree,
-  appendFold,
-  mayAppendFold,
-  appendTraverse,
-  mayAppendTraverse,
-  Map,
-  Free(..),
-  KeyTree,
-  KeyForest,
-) where
+module KeyTree
+  ( foldKeyTree
+  , appendFold
+  , mayAppendFold
+  , appendTraverse
+  , mayAppendTraverse
+  , Map
+  , Free (..)
+  , KeyTree
+  , KeyForest
+  )
+where
 
 import Control.Monad.Free
 import Data.Functor ((<&>))
