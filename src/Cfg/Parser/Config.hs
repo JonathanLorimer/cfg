@@ -28,9 +28,10 @@ import GHC.Generics
 import KeyTree
 
 -- | This function is the workhorse of the generic machinery, however the user
--- should never have to invoke it directly. Instead a deriving via instance
--- should call into this function from a 'Cfg.Parser.ConfigParser' instance,
--- which will pull out the 'ConfigOptions' from type level tags.
+-- should never have to invoke it directly. Instead, one of the newtypes from
+-- 'Cfg.Deriving.Config' should call into this function in the definition of a
+-- 'Cfg.Parser.ConfigParser' instance. The deriving via type should pull out
+-- the 'ConfigOptions' from type level information.
 --
 -- @since 0.0.1.0
 defaultParseConfig
@@ -42,7 +43,7 @@ defaultParseConfig
 defaultParseConfig opts tree = fmap to $ gParseConfig opts tree
 
 -- | This class is the generic version of 'ConfigParser'. It recurses on the
--- generic structure of a type, building up a return type.
+-- generic structure of a type, building up a return type for the parser.
 --
 -- @since 0.0.2.0
 class GConfigParser (f :: Type -> Type) where
@@ -50,10 +51,11 @@ class GConfigParser (f :: Type -> Type) where
 
 -- | This is the \"base case\", since "GHC.Generics" don't recurse the generic
 -- represetation multiple levels, @a@ is just a plain type. Therefore we call
--- 'parseConfig' on it, which may be another nested record (in which case the
--- 'gParseConfig' will probably get called again), or it will find the default
--- instance for 'ConfigParser' (indicating that we have reached a leaf) and
--- dispatch to a value parser.
+-- 'parseConfig' on it. @a@ may be another nested record, in which case
+-- 'gParseConfig' will probably get called again, but for the generic
+-- representation of a sub-tree. Or it will find the default instance for
+-- 'ConfigParser' (indicating that we have reached a leaf) and dispatch to a
+-- value parser through 'parseConfig'.
 --
 -- @since 0.0.2.0
 instance (ConfigParser a) => GConfigParser (K1 R a) where
