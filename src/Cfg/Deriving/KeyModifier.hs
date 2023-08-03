@@ -10,9 +10,9 @@
 -- This module provides type level tags that can be used to configure string
 -- transformations against configuration keys derived from things like record
 -- fields.
-module Cfg.Deriving.KeyModifier (
-  -- * Key Modifiers
-    KeyModifier(..)
+module Cfg.Deriving.KeyModifier
+  ( -- * Key Modifiers
+    KeyModifier (..)
   , Identity
   , ToLower
   , ToUpper
@@ -23,11 +23,13 @@ module Cfg.Deriving.KeyModifier (
   , CamelTo
   , CamelToSnake
   , CamelToKebab
-  -- * Helper Functions
+
+    -- * Helper Functions
   , mapFirst
-  , camelTo 
+  , camelTo
   , camelToText
-) where
+  )
+where
 
 import Cfg.Options (RootKey (..))
 import Data.Char (isLower, isUpper, toLower, toUpper)
@@ -174,9 +176,11 @@ mapFirst f text = T.uncons text <&> \(first, rest) -> f first `T.cons` rest
 -- on a provided separator char.
 --
 -- @since 0.0.2.0
-camelTo 
-  :: Char -- ^ Separator character
-  -> String -- ^ Camel cased string
+camelTo
+  :: Char
+  -- ^ Separator character
+  -> String
+  -- ^ Camel cased string
   -> String
 camelTo c = map toLower . go2 . go1
  where

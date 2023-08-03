@@ -10,10 +10,7 @@
 -- This module provides a type 'Value' for generating instances for \"leaf\"
 -- elements of your configuration tree. These are the elements you actually
 -- care about and want to parse out of a configuration source.
-module Cfg.Deriving.Value (
-  -- * Type
-  Value(..)
-) where
+module Cfg.Deriving.Value where
 
 import Cfg.Parser
 import Cfg.Parser.Value
@@ -25,7 +22,7 @@ import GHC.Generics
 -- types, and product types without named fields (i.e. not records). The
 -- majority of the types that you would want as values should have instances in
 -- "Cfg.Source" and "Cfg.Parser".
--- 
+--
 -- @since 0.0.2.0
 newtype Value a = Value {unValue :: a}
 

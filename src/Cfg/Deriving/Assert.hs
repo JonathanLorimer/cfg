@@ -32,8 +32,10 @@ type family IsTopLevelRecord f where
   IsTopLevelRecord V1 = 'False
   IsTopLevelRecord U1 = 'False
   IsTopLevelRecord (K1 i c) = 'False
-  IsTopLevelRecord (M1 i c f) = IsTopLevelRecord f
-  IsTopLevelRecord (f :*: g) = 'True
+  IsTopLevelRecord (M1 D c f) = IsTopLevelRecord f
+  IsTopLevelRecord (M1 C c f) = IsTopLevelRecord f
+  IsTopLevelRecord (M1 S c f) = 'True
+  IsTopLevelRecord (f :*: g) = IsTopLevelRecord f
   IsTopLevelRecord (f :+: g) = 'False
 
 -- | A custom error message for non-top-level records

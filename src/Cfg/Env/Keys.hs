@@ -15,11 +15,11 @@
 module Cfg.Env.Keys where
 
 import Cfg.Source (ConfigSource (..))
+import Data.Foldable
 import Data.List (intersperse)
 import Data.Map.Strict (empty)
 import Data.Text (Text)
 import KeyTree
-import Data.Foldable
 
 -- | This function takes a separator and a list of keys and joins them from the
 -- end of the list to the beginning, interspersed with the provided separator.
@@ -28,9 +28,11 @@ import Data.Foldable
 -- "A_B_C"
 --
 -- @since 0.0.1.0
-getEnvKey 
-  :: Text -- ^ Separator
-  -> [Text] -- ^ List of keys
+getEnvKey
+  :: Text
+  -- ^ Separator
+  -> [Text]
+  -- ^ List of keys
   -> Text
 getEnvKey sep = fold . intersperse sep
 
@@ -46,7 +48,7 @@ getEnvKey sep = fold . intersperse sep
 --     B   C
 --
 --  [ [ "A", "B" ]
---  , [ "A", "C" ] 
+--  , [ "A", "C" ]
 --  ]
 -- @
 -- >>> import KeyTree
@@ -79,9 +81,11 @@ getKeys = foldKeyTree valF stepF []
 -- ["A-B","A-C"]
 --
 -- @since 0.0.1.0
-showEnvKeys' 
-  :: Text -- ^ Separator
-  -> KeyTree Text Text -- ^ Configuration tree
+showEnvKeys'
+  :: Text
+  -- ^ Separator
+  -> KeyTree Text Text
+  -- ^ Configuration tree
   -> [Text]
 showEnvKeys' sep tree = getEnvKey sep <$> getKeys tree
 
@@ -93,16 +97,16 @@ showEnvKeys' sep tree = getEnvKey sep <$> getKeys tree
 -- >>> import Cfg.Deriving.Config (Config(..))
 -- >>> import Cfg.Source.Default (DefaultSource(..))
 -- >>> :{
--- data Sub = Sub { c :: Int, d :: Bool } 
+-- data Sub = Sub { c :: Int, d :: Bool }
 --   deriving (Generic, Show, DefaultSource)
 --   deriving (ConfigSource, ConfigParser) via Config Sub
--- data TypeCon = DataCon { a :: Sub, b :: Int }
+-- data TypeCon = DataCon { a :: Sub }
 --   deriving (Generic, Show, DefaultSource)
 --   deriving (ConfigSource, ConfigParser) via Config TypeCon
 -- :}
 --
 -- >>> showEnvKeys @TypeCon "_"
--- ["a_c","a_d","b"]
+-- ["a_c","a_d"]
 --
 -- @since 0.0.1.0
 showEnvKeys :: forall a. (ConfigSource a) => Text -> [Text]
