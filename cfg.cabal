@@ -55,6 +55,8 @@ common common-opts
     TypeApplications
     TypeFamilies
     TypeOperators
+    UndecidableInstances
+    PolyKinds
 
   build-depends:
     , base           >=4.18.0 && <4.19
