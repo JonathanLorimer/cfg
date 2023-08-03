@@ -25,6 +25,7 @@
           hsPkgs = pkgs.haskell.packages.${compilerVersion}.override {
             overrides = hfinal: hprev: {
               cfg = hfinal.callCabal2nix "cfg" ./. {};
+              doctest = hfinal.doctest_0_21_1;
             };
           };
         });

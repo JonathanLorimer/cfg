@@ -41,4 +41,5 @@ main = doctest
   , "src/Cfg.hs"
   , "src/Cfg/Env/Keys.hs"
   , "src/KeyTree.hs"
+  , "src/Cfg/Env.hs"
   ]
