@@ -1,5 +1,9 @@
--- | Module      : Cfg.Source.Config Copyright   : © Jonathan Lorimer, 2023
--- License     : MIT Maintainer  : jonathanlorimer@pm.me Stability   : stable
+-- | 
+--  Module      : Cfg.Source.Config 
+--  Copyright   : © Jonathan Lorimer, 2023
+--  License     : MIT 
+--  Maintainer  : jonathanlorimer@pm.me 
+--  Stability   : stable
 --
 -- @since 0.0.2.0
 --
