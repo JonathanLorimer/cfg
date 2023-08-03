@@ -57,10 +57,10 @@ class GConfigSource (a :: Type -> Type) where
 -- | This is the \"base case\", since "GHC.Generics" don't recurse the generic
 -- represetation multiple levels, @a@ is just a plain type. Therefore we call
 -- 'configSource' on it. @a@ may be another nested record, in which case
--- 'gParseConfig' will probably get called again, but for the generic
--- representation of a sub-tree. It will do this until it finds a
--- 'ConfigSource' instance for 'Value' which will just add a 'Free
--- Data.Map.empty' (indicating a hole to be filled when we fetch the
+-- 'Cfg.Parser.Config.gParseConfig' will probably get called again, but for the
+-- generic representation of a sub-tree. It will do this until it finds a
+-- 'ConfigSource' instance for 'Cfg.Deriving.Value.Value' which will just add a
+-- 'Free Data.Map.empty' (indicating a hole to be filled when we fetch the
 -- configuration).
 --
 -- @since 0.0.2.0

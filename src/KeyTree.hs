@@ -1,3 +1,16 @@
+-- |
+--  Module      : KeyTree
+--  Copyright   : © Jonathan Lorimer, 2023
+--  License     : MIT
+--  Maintainer  : jonathanlorimer@pm.me
+--  Stability   : stable
+--
+-- @since 0.0.2.0
+--
+-- This module contains types for our internal tree representation of types and
+-- configurations. It also contains some helper functions for working with
+-- these trees. This should make it easier to implement different source
+-- providers.
 module KeyTree
   ( -- * Types
     KeyTree

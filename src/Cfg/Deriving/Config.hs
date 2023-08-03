@@ -154,7 +154,7 @@ instance (Generic a) => Generic (ConfigOpts t a) where
 -- argument to `ConfigRoot`. These `Cfg.Options.RootKey` types also take a type
 -- level argument where you can provide key modifiers, if you don't want to
 -- apply any key modifiers you can pass in 'Cfg.Deriving.KeyModifier.Identity'
--- or '()' or an empty type level list.
+-- or an empty tuple or an empty type level list.
 --
 -- ===== __@TypeName@ Example__
 --

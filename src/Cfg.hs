@@ -317,7 +317,7 @@ module Cfg
     --    via ('ConfigOpts' ['StripPrefix' "appConfig", 'StripSuffix' \"Settings\", ToUpper] AppConfig)
     --
     -- -- NOTE: If I provide a default for WarpConfig or RedisConfig this will break the configuration machinery
-    -- -- so I only match on the field for 'Environment'
+    -- -- so I only match on the field for @Environment@
     --
     -- instance 'DefaultSource' (AppConfig a) where
     --   'defaults' "appConfigEnvironment" = Just "Development"
