@@ -62,6 +62,7 @@
             buildInputs = with pkgs;
               [
                 haskellPackages.cabal-install
+                haskellPackages.cabal-fmt
                 hsPkgs.fourmolu_0_13_0_0
               ]
               ++ (builtins.attrValues (import ./scripts.nix {s = pkgs.writeShellScriptBin;}));
