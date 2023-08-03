@@ -1,0 +1,28 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Create Github Release
+        uses: ncipollo/release-action@v1
+        with:
+          generateReleaseNotes: true
+
+      - name: Push Hackage
+        env: 
+          HACKAGE_TOKEN: ${{ secrets.HACKAGE_RELEASE_TOKEN }}
+          HACKAGE_USERNAME: ${{ secrets.HACKAGE_USERNAME }}
+          HACKAGE_PASSWORD: ${{ secrets.HACKAGE_PASSWORD }}
+          REF_NAME: ${{ env.GITHUB_REF_NAME }}
+        run: nix develop .#ci -c hkg 
+
