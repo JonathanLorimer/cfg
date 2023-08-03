@@ -11,12 +11,14 @@
 -- structure of a type. The majority of the work here is threading a
 -- 'Cfg.Parser.Value.ValueParser' through the 'KeyTree.KeyTree' structure until
 -- a 'Pure' value is hit, and then dispatching the correct parser.
-module Cfg.Parser.Config (
-    -- * Default Parser Function
+module Cfg.Parser.Config
+  ( -- * Default Parser Function
     defaultParseConfig
+
     -- * Generic Machinery
-  , GConfigParser(..)
-) where
+  , GConfigParser (..)
+  )
+where
 
 import Cfg.Options
 import Cfg.Parser (ConfigParseError (..), ConfigParser (..))

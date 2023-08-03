@@ -72,4 +72,3 @@ instance (GValueParser a, GValueParser b) => GValueParser (a :+: b) where
 -- @since 0.0.2.0
 instance (GValueParser a, GValueParser b) => GValueParser (a :*: b) where
   gParser = liftA2 (:*:) (gParser @a) (gParser @b)
-
