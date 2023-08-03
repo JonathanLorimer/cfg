@@ -9,7 +9,7 @@
   formatCheckScript = s "format-check" ''
     fourmolu --mode check src 
     fourmolu --mode check test 
-    cabal-fmt --wError -c ./cfg.cabal
+    cabal-fmt -c ./cfg.cabal --Werror 
   '';
   hoogleScript = s "hgl" "hoogle serve";
   uploadToHackageScript = s "hkg" (builtins.readFile ./scripts/hkg.sh);
