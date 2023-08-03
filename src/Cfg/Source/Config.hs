@@ -1,8 +1,8 @@
--- | 
---  Module      : Cfg.Source.Config 
+-- |
+--  Module      : Cfg.Source.Config
 --  Copyright   : © Jonathan Lorimer, 2023
---  License     : MIT 
---  Maintainer  : jonathanlorimer@pm.me 
+--  License     : MIT
+--  Maintainer  : jonathanlorimer@pm.me
 --  Stability   : stable
 --
 -- @since 0.0.2.0
@@ -17,7 +17,7 @@
 -- the leaves that can be used if the source fetcher doesn't return a value for
 -- that key. In the case that there is no default a 'Free Data.Map.empty' is
 -- placed to represent a required value.
-module Cfg.Source.Config 
+module Cfg.Source.Config
   ( -- * Default Source Generator
     defaultConfigSource
 

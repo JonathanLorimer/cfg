@@ -9,7 +9,18 @@
 --
 -- This module contains all the functions for interacting with environment
 -- variables as a configuration source.
-module Cfg.Env where
+module Cfg.Env
+  ( -- * Retrieval Functions
+    envSourceSep
+  , envSource
+  , getEnvConfigSep
+  , getEnvConfig
+
+    -- * Printing Functions
+  , printDotEnv'
+  , printDotEnv
+  )
+where
 
 import Cfg
 import Cfg.Env.Keys
@@ -54,9 +65,12 @@ import Prelude hiding (writeFile)
 envSourceSep
   :: forall m
    . (MonadIO m)
-  => Text -- ^ Separator
-  -> KeyTree Text Text -- ^ Configuration source
-  -> m (KeyTree Text Text) -- ^ Configuration tree with values filled in
+  => Text
+  -- ^ Separator
+  -> KeyTree Text Text
+  -- ^ Configuration source
+  -> m (KeyTree Text Text)
+  -- ^ Configuration tree with values filled in
 envSourceSep sep = mayAppendTraverse valF accF stepF []
  where
   valF :: [Text] -> Text -> m Text
@@ -92,10 +106,13 @@ envSource = envSourceSep "_"
 -- like, and generating an env var file template.
 --
 -- @since 0.0.1.0
-printDotEnv' 
-  :: FilePath -- ^ Destination filepath
-  -> Text -- ^ Separator
-  -> KeyTree Text Text -- ^ Source representation
+printDotEnv'
+  :: FilePath
+  -- ^ Destination filepath
+  -> Text
+  -- ^ Separator
+  -> KeyTree Text Text
+  -- ^ Source representation
   -> IO ()
 printDotEnv' path sep = writeFile path . foldMap (\line -> "export " <> line <> "=\n") . showEnvKeys' sep
 
@@ -108,8 +125,10 @@ printDotEnv' path sep = writeFile path . foldMap (\line -> "export " <> line <> 
 --
 -- @since 0.0.1.0
 getEnvConfigSep
-  :: forall a m . (MonadFail m, MonadIO m, ConfigSource a, ConfigParser a) 
-  => Text -- ^ Separator
+  :: forall a m
+   . (MonadFail m, MonadIO m, ConfigSource a, ConfigParser a)
+  => Text
+  -- ^ Separator
   -> m (Either ConfigParseError a)
 getEnvConfigSep sep = getConfig $ envSourceSep sep
 
@@ -117,7 +136,7 @@ getEnvConfigSep sep = getConfig $ envSourceSep sep
 --
 -- @since 0.0.1.0
 getEnvConfig
-  :: forall a m . (MonadFail m, MonadIO m, ConfigSource a, ConfigParser a) => m (Either ConfigParseError a)
+  :: forall a m. (MonadFail m, MonadIO m, ConfigSource a, ConfigParser a) => m (Either ConfigParseError a)
 getEnvConfig = getConfig $ envSource
 
 -- | The same as 'printDotEnv'' but with the separator hard coded to \"_\" and

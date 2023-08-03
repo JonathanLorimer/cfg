@@ -12,7 +12,6 @@ module Cfg.Source.Default where
 
 import Data.Text (Text)
 
-
 -- TODO: Figure out a way to make this error when there is a nested record
 
 -- | This class lets us represent defaults as a function from record field
@@ -21,7 +20,9 @@ import Data.Text (Text)
 --
 -- @since 0.0.2.0
 class DefaultSource a where
-  defaults 
-    :: Text -- ^ Record field label
-    -> Maybe Text -- ^ Serialized default
+  defaults
+    :: Text
+    -- ^ Record field label
+    -> Maybe Text
+    -- ^ Serialized default
   defaults = const Nothing
