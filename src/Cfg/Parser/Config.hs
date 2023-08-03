@@ -77,7 +77,7 @@ instance (GConfigParser f, Datatype d) => GConfigParser (M1 D d f) where
         in
           case M.lookup key keyForest of
             Just subTree -> M1 <$> gParseConfig opts subTree
-            Nothing -> Left $ MissingKeys [key] t
+            Nothing -> Left $ MissingKey key t
       _ -> M1 <$> gParseConfig opts t
   gParseConfig opts (Pure value) = Left $ ExpectedKeyFoundValue key value
    where
@@ -97,7 +97,7 @@ instance (Constructor c, GConfigParser f) => GConfigParser (M1 C c f) where
         in
           case M.lookup key keyForest of
             Just subTree -> M1 <$> gParseConfig opts subTree
-            Nothing -> Left $ MissingKeys [key] t
+            Nothing -> Left $ MissingKey key t
       _ -> M1 <$> gParseConfig opts t
   gParseConfig opts (Pure value) = Left $ ExpectedKeyFoundValue key value
    where
@@ -114,7 +114,7 @@ instance (Selector s, GConfigParser f) => GConfigParser (M1 S s f) where
     key = keyModifier opts . T.pack $ selName @s undefined
   gParseConfig opts t@(Free keyForest) =
     case M.lookup selectorName keyForest of
-      Nothing -> Left $ MissingKeys [selectorName] t
+      Nothing -> Left $ MissingKey selectorName t
       Just subTree -> M1 <$> gParseConfig opts subTree
    where
     selectorName = keyModifier opts . T.pack $ selName @s undefined

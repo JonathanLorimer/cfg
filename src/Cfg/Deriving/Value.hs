@@ -26,12 +26,15 @@ import GHC.Generics
 -- @since 0.0.2.0
 newtype Value a = Value {unValue :: a}
 
+-- | @since 0.0.2.0
 instance (Generic a) => Generic (Value a) where
   type Rep (Value a) = Rep a
   to = Value . to
   from (Value x) = from x
 
+-- | @since 0.0.2.0
 instance (Generic a, GValueParser (Rep a)) => ValueParser (Value a) where
   parser = coerce `asTypeOf` fmap Value $ defaultValueParser @a
 
+-- | @since 0.0.2.0
 instance (Generic a, GValueParser (Rep a)) => ConfigParser (Value a)

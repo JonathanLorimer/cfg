@@ -87,6 +87,7 @@ import GHC.Generics
 -- @since 0.0.2.0
 newtype Config a = Config {unConfig :: a}
 
+-- | @since 0.0.2.0
 instance (Generic a) => Generic (Config a) where
   type Rep (Config a) = Rep a
   to = Config . to
@@ -138,6 +139,7 @@ instance (Generic a) => Generic (Config a) where
 -- @since 0.0.2.0
 newtype ConfigOpts fieldModifier a = ConfigOpts {unConfigOptions :: a}
 
+-- | @since 0.0.2.0
 instance (Generic a) => Generic (ConfigOpts t a) where
   type Rep (ConfigOpts t a) = Rep a
   to = ConfigOpts . to
@@ -257,9 +259,11 @@ newtype ConfigRoot rootType fieldModifier a = ConfigRoot {unConfigRoot :: a}
 class (KeyModifier t) => GetConfigOptions t where
   getOptions :: KeyOptions
 
+-- | @since 0.0.2.0
 instance (KeyModifier t) => GetConfigOptions t where
   getOptions = KeyOptions (getKeyModifier @t)
 
+-- | @since 0.0.2.0
 instance (Generic a) => Generic (ConfigRoot r f a) where
   type Rep (ConfigRoot r f a) = Rep a
   to = ConfigRoot . to
@@ -271,19 +275,24 @@ instance (Generic a) => Generic (ConfigRoot r f a) where
 class (KeyModifier r, KeyModifier f) => ConfigRootOptions r f where
   configRootOptions :: RootOptions
 
+-- | @since 0.0.2.0
 instance (KeyModifier (TypeName k), KeyModifier f) => ConfigRootOptions (TypeName k) f where
   configRootOptions = RootOptions (TypeName $ getKeyModifier @(TypeName k)) (getKeyModifier @f)
 
+-- | @since 0.0.2.0
 instance (KeyModifier (ConstructorName k), KeyModifier f) => ConfigRootOptions (ConstructorName k) f where
   configRootOptions = RootOptions (ConstructorName $ getKeyModifier @(ConstructorName k)) (getKeyModifier @f)
 
 -- Source
+
+-- | @since 0.0.2.0
 instance
   (AssertTopLevelRecord ConfigSource a, DefaultSource a, Generic a, GConfigSource (Rep a))
   => ConfigSource (Config a)
   where
   configSource = defaultConfigSource @a defaultConfigOptions
 
+-- | @since 0.0.2.0
 instance
   ( GetConfigOptions t
   , AssertTopLevelRecord ConfigSource a
@@ -295,6 +304,7 @@ instance
   where
   configSource = defaultConfigSource @a (Key $ getOptions @t)
 
+-- | @since 0.0.2.0
 instance
   ( ConfigRootOptions r f
   , AssertTopLevelRecord ConfigSource a
@@ -307,12 +317,15 @@ instance
   configSource = defaultConfigSource @a (Root $ configRootOptions @r @f)
 
 -- Parser
+
+-- | @since 0.0.2.0
 instance
   (AssertTopLevelRecord ConfigParser a, Generic a, GConfigParser (Rep a))
   => ConfigParser (Config a)
   where
   parseConfig keyTree = coerce `asTypeOf` fmap Config $ defaultParseConfig defaultConfigOptions keyTree
 
+-- | @since 0.0.2.0
 instance
   ( GetConfigOptions t
   , AssertTopLevelRecord ConfigSource a
@@ -323,6 +336,7 @@ instance
   where
   parseConfig keyTree = coerce `asTypeOf` fmap ConfigOpts $ defaultParseConfig (Key $ getOptions @t) keyTree
 
+-- | @since 0.0.2.0
 instance
   ( ConfigRootOptions r f
   , AssertTopLevelRecord ConfigParser a

@@ -11,7 +11,20 @@
 -- functions. Mostly these are used for registering text transformations on
 -- keys, but another interesting use case is choosing between the type
 -- constructor and the data constructor for deriving a name for root keys.
-module Cfg.Options where
+module Cfg.Options
+  ( -- * Option Types
+    KeyOptions (..)
+  , RootKey (..)
+  , RootOptions (..)
+  , ConfigOptions (..)
+
+    -- * Helper Functions
+  , defaultKeyOptions
+  , defaultRootOptions
+  , defaultConfigOptions
+  , keyModifier
+  )
+where
 
 import Data.Text (Text)
 
