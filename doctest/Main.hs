@@ -36,6 +36,9 @@ main = doctest
   ,  "-XTypeApplications"
   ,  "-XTypeFamilies"
   ,  "-XTypeOperators"
+  ,  "-XUndecidableInstances"
+  ,  "-XPolyKinds"
   , "src/Cfg.hs"
   , "src/Cfg/Env/Keys.hs"
+  , "src/KeyTree.hs"
   ]

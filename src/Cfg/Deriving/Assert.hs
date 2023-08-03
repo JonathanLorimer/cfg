@@ -1,5 +1,5 @@
 -- |
---  Module      : Cfg
+--  Module      : Cfg.Deriving.Assert
 --  Copyright   : © Jonathan Lorimer, 2023
 --  License     : MIT
 --  Maintainer  : jonathanlorimer@pm.me

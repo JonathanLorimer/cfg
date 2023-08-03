@@ -1,8 +1,5 @@
-{-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE UndecidableInstances #-}
-
 -- |
---  Module      : Cfg
+--  Module      : Cfg.Deriving.Config
 --  Copyright   : © Jonathan Lorimer, 2023
 --  License     : MIT
 --  Maintainer  : jonathanlorimer@pm.me
@@ -54,6 +51,8 @@ import GHC.Generics
 -- >>> import GHC.Generics (Generic (..))
 -- >>> import Cfg.Source (ConfigSource(..))
 -- >>> import Cfg.Parser (ConfigParser(..))
+-- >>> import Cfg.Deriving.Config (Config(..))
+-- >>> import Cfg.Source.Default (DefaultSource(..))
 -- >>> :{
 -- data AppConfig = AppConfig
 --   { appConfigSetting1 :: Int
@@ -102,7 +101,8 @@ instance (Generic a) => Generic (Config a) where
 -- >>> import GHC.Generics (Generic (..))
 -- >>> import Cfg.Source (ConfigSource(..))
 -- >>> import Cfg.Parser (ConfigParser(..))
--- >>> import Cfg.Deriving.KeyModifier
+-- >>> import Cfg.Deriving.Config (Config(..))
+-- >>> import Cfg.Source.Default (DefaultSource(..))
 -- >>> :{
 -- data AppConfig = AppConfig
 --   { appConfigSetting1 :: Int
@@ -152,13 +152,15 @@ instance (Generic a) => Generic (ConfigOpts t a) where
 -- argument to `ConfigRoot`. These `Cfg.Options.RootKey` types also take a type
 -- level argument where you can provide key modifiers, if you don't want to
 -- apply any key modifiers you can pass in 'Cfg.Deriving.KeyModifier.Identity'
--- or ''()' or an empty type level list.
+-- or '()' or an empty type level list.
 --
 -- ===== __@TypeName@ Example__
 --
 -- >>> import GHC.Generics (Generic (..))
 -- >>> import Cfg.Source (ConfigSource(..))
 -- >>> import Cfg.Parser (ConfigParser(..))
+-- >>> import Cfg.Deriving.Config (Config(..))
+-- >>> import Cfg.Source.Default (DefaultSource(..))
 -- >>> import Cfg.Deriving.KeyModifier
 -- >>> :{
 -- data TypeNameConfig = ConfigConstructor
