@@ -9,9 +9,15 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-22.04
+    permissions:
+      contents: write
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Cabal Check
+        run: nix develop .#ci -c cabal check 
 
       - name: Create Github Release
         uses: ncipollo/release-action@v1
@@ -23,6 +29,6 @@ jobs:
           HACKAGE_TOKEN: ${{ secrets.HACKAGE_RELEASE_TOKEN }}
           HACKAGE_USERNAME: ${{ secrets.HACKAGE_USERNAME }}
           HACKAGE_PASSWORD: ${{ secrets.HACKAGE_PASSWORD }}
-          REF_NAME: ${{ env.GITHUB_REF_NAME }}
+          REF_NAME: ${{ github.ref_name }}
         run: nix develop .#ci -c hkg 
 
