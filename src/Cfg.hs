@@ -279,9 +279,7 @@ module Cfg
     -- 'DefaultSource' instance for the record that contains the value you want
     -- to default. The reason the defaulting needs to be defined on the record
     -- is that we use the record field key to identify the defaulted value the
-    -- value you want to default. The reason the defaulting needs to be defined
-    -- on the record is that we use the record field key to identify the
-    -- defaulted value.
+    -- value you want to default.
     --
     -- __There are a bunch of gotchas with defaulting__:
     --
@@ -319,7 +317,7 @@ module Cfg
     -- -- NOTE: If I provide a default for WarpConfig or RedisConfig this will break the configuration machinery
     -- -- so I only match on the field for @Environment@
     --
-    -- instance 'DefaultSource' (AppConfig a) where
+    -- instance 'DefaultSource' AppConfig where
     --   'defaults' "appConfigEnvironment" = Just "Development"
     --   'defaults' _ = Nothing
     -- @
@@ -468,3 +466,17 @@ data AppConfig4 = AppConfig4
             [StripPrefix "appConfig", StripSuffix "Settings", ToUpper]
             AppConfig4
         )
+
+-- Example 5
+data AppConfig5 = AppConfig5
+  { appConfigWarpSettings :: WarpConfig
+  , appConfigRedisSettings :: RedisConfig
+  , appConfigEnvironment :: Environment
+  }
+  deriving (Generic, Show)
+  deriving (ConfigSource, ConfigParser)
+   via (ConfigOpts [StripPrefix "appConfig", StripSuffix "Settings", ToUpper] AppConfig5)
+
+instance DefaultSource AppConfig5 where
+  defaults "appConfigEnvironment" = Just "Development"
+  defaults _ = Nothing
