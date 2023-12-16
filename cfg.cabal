@@ -133,4 +133,4 @@ test-suite documentation
   main-is:        Main.hs
   build-depends:
     , cfg
-    , doctest  >=0.21.1 && <0.22
+    , doctest  >=0.21.1 && <0.23
