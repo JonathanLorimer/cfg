@@ -125,7 +125,6 @@ test-suite cfg-tests
     , hspec-expectations  >=0.7.0 && <0.9
     , hspec-hedgehog      >=0.0.1 && <0.2
 
-
 test-suite documentation
   import:         common-opts
   type:           exitcode-stdio-1.0
