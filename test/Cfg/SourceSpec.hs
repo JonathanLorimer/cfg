@@ -4,7 +4,6 @@ import Cfg.Deriving.Config
 import Cfg.Deriving.KeyModifier
 import Cfg.Deriving.Value
 import Cfg.Options
-import Cfg.Parser
 import Cfg.Source
 import Cfg.Source.Default
 import Data.Map.Strict (empty, fromList, singleton)

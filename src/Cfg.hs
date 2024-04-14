@@ -474,8 +474,9 @@ data AppConfig5 = AppConfig5
   , appConfigEnvironment :: Environment
   }
   deriving (Generic, Show)
-  deriving (ConfigSource, ConfigParser)
-   via (ConfigOpts [StripPrefix "appConfig", StripSuffix "Settings", ToUpper] AppConfig5)
+  deriving
+    (ConfigSource, ConfigParser)
+    via (ConfigOpts [StripPrefix "appConfig", StripSuffix "Settings", ToUpper] AppConfig5)
 
 instance DefaultSource AppConfig5 where
   defaults "appConfigEnvironment" = Just "Development"

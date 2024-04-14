@@ -1,7 +1,6 @@
 module Cfg.Env.KeysSpec where
 
 import Cfg.Deriving
-import Cfg.Deriving.KeyModifier
 import Cfg.Env.Keys
 import Cfg.Options
 import Cfg.Source (ConfigSource)

@@ -14,20 +14,28 @@
       forAllSystems = function:
         nixpkgs.lib.genAttrs [
           "x86_64-linux"
-          "aarch64-linux"
-          "x86_64-darwin"
-          "aarch64-darwin"
+          # "aarch64-linux"
+          # "x86_64-darwin"
+          # "aarch64-darwin"
         ] (system: function rec {
           inherit system;
-          compilerVersion = "ghc962";
+          latestCompilerVersion = "ghc982";
+          compilerVersions = [
+            "ghc964"
+            latestCompilerVersion
+          ];
           pkgs = nixpkgs.legacyPackages.${system};
-          
-          hsPkgs = pkgs.haskell.packages.${compilerVersion}.override {
-            overrides = hfinal: hprev: {
-              cfg = hfinal.callCabal2nix "cfg" ./. {};
-              doctest = hfinal.doctest_0_21_1;
-            };
+          overrides = hfinal: hprev: {
+            cfg = hfinal.callCabal2nix "cfg" ./. {};
           };
+          
+          hsPkgs = pkgs.lib.lists.foldr (cv: hp: 
+            { 
+              "${cv}" = pkgs.haskell.packages.${cv}.override {
+                inherit overrides;
+              };
+            } // hp
+          ) {} compilerVersions;
         });
     in
     {
@@ -35,27 +43,29 @@
       formatter = forAllSystems ({pkgs, ...}: pkgs.alejandra);
 
       # nix develop
-      devShells = forAllSystems ({hsPkgs, pkgs, system, ...}: {
+      devShells = forAllSystems ({latestCompilerVersion, hsPkgs, pkgs, system, ...}: 
+      let hp = hsPkgs."${latestCompilerVersion}";
+      in {
         default = 
-          hsPkgs.shellFor {
+          hp.shellFor {
             packages = p: [
               p.cfg
             ];
             buildInputs = with pkgs;
               [
-                hsPkgs.haskell-language-server
+                hp.haskell-language-server
                 haskellPackages.cabal-install
                 cabal2nix
-                haskellPackages.ghcid
-                hsPkgs.fourmolu_0_13_0_0
-                haskellPackages.cabal-fmt
+                hp.ghcid
+                hp.fourmolu_0_15_0_0
+                hp.cabal-fmt
                 nodePackages_latest.serve
-                hsPkgs.doctest_0_21_1
+                hp.doctest
               ]
               ++ (builtins.attrValues (import ./scripts.nix {s = pkgs.writeShellScriptBin;}));
-        };
+          };
         ci =
-          hsPkgs.shellFor {
+          hp.shellFor {
             packages = p: [
               p.cfg
             ];
@@ -63,29 +73,31 @@
               [
                 haskellPackages.cabal-install
                 haskellPackages.cabal-fmt
-                hsPkgs.fourmolu_0_13_0_0
+                hp.fourmolu_0_15_0_0
               ]
               ++ (builtins.attrValues (import ./scripts.nix {s = pkgs.writeShellScriptBin;}));
         };
       });
 
       # nix build
-      packages = forAllSystems ({hsPkgs, ...}: {
-          cfg = hsPkgs.cfg;
-          default = hsPkgs.cfg;
-          inherit hsPkgs;
-      });
+      packages = forAllSystems ({pkgs, hsPkgs, latestCompilerVersion, compilerVersions, ...}: with pkgs.lib;
+        { default = hsPkgs."${latestCompilerVersion}".cfg; 
+          printCompilerVersions = pkgs.writeShellScriptBin "printCompilerVersions" (lists.foldr (cv: acc: "echo ${cv};" + acc) "" compilerVersions);
+        } 
+        // attrsets.mapAttrs' (cv: hp: attrsets.nameValuePair "cfg${strings.toUpper cv}" hp.cfg) hsPkgs
+      );
 
-      # You can't build the cfg package as a check because of IFD in cabal2nix
-      checks = {};
+      checks = forAllSystems ({pkgs, hsPkgs, latestCompilerVersion, compilerVersions, ...}: with pkgs.lib;
+        attrsets.mapAttrs' (cv: hp: attrsets.nameValuePair "cfg${strings.toUpper cv}" hp.cfg) hsPkgs
+      );
 
       # nix run
       apps = forAllSystems ({system, ...}: {
-        cfg = { 
+        printCompilerVersions = { 
           type = "app"; 
-          program = "${self.packages.${system}.cfg}/bin/cfg"; 
+          program = "${self.packages.${system}.printCompilerVersions}/bin/printCompilerVersions"; 
         };
-        default = self.apps.${system}.cfg;
+        default = self.apps.${system}.printCompilerVersions;
       });
     };
 }
