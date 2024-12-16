@@ -6,7 +6,6 @@ import Data.Text (Text)
 import KeyTree
 import System.Environment (setEnv, unsetEnv)
 import Test.Hspec
-import Test.Hspec.Core.Spec (sequential)
 
 spec :: Spec
 spec = around

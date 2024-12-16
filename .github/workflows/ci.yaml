@@ -34,8 +34,8 @@ jobs:
     - name: Run flake check (checks all ghc versions)
       run: nix flake check
     - name: Run library tests (latest versions)
-      run: nix develop .#ci -c tst 
+      run: nix develop .#ci -c tst
     - name: Run doc tests (latest versions)
-      run: nix develop .#ci -c dtst 
+      run: nix develop .#ci -c dtst
     - name: check formatting (current source)
-      run: nix develop .#ci -c format-check 
+      run: nix develop .#ci -c format-check

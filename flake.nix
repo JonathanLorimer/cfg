@@ -9,95 +9,75 @@
   outputs = {
     self,
     nixpkgs,
-  }: 
-    let
-      forAllSystems = function:
-        nixpkgs.lib.genAttrs [
-          "x86_64-linux"
-          # "aarch64-linux"
-          # "x86_64-darwin"
-          # "aarch64-darwin"
-        ] (system: function rec {
+  }: let
+    forAllSystems = function:
+      nixpkgs.lib.genAttrs [
+        "x86_64-linux"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
+      ] (system:
+        function rec {
           inherit system;
-          latestCompilerVersion = "ghc982";
-          compilerVersions = [
-            "ghc964"
-            latestCompilerVersion
-          ];
           pkgs = nixpkgs.legacyPackages.${system};
           overrides = hfinal: hprev: {
             cfg = hfinal.callCabal2nix "cfg" ./. {};
           };
-          
-          hsPkgs = pkgs.lib.lists.foldr (cv: hp: 
-            { 
-              "${cv}" = pkgs.haskell.packages.${cv}.override {
-                inherit overrides;
-              };
-            } // hp
-          ) {} compilerVersions;
-        });
-    in
-    {
-      # nix fmt
-      formatter = forAllSystems ({pkgs, ...}: pkgs.alejandra);
-
-      # nix develop
-      devShells = forAllSystems ({latestCompilerVersion, hsPkgs, pkgs, system, ...}: 
-      let hp = hsPkgs."${latestCompilerVersion}";
-      in {
-        default = 
-          hp.shellFor {
-            packages = p: [
-              p.cfg
-            ];
-            buildInputs = with pkgs;
-              [
-                hp.haskell-language-server
-                haskellPackages.cabal-install
-                cabal2nix
-                hp.ghcid
-                hp.fourmolu_0_15_0_0
-                hp.cabal-fmt
-                nodePackages_latest.serve
-                hp.doctest
-              ]
-              ++ (builtins.attrValues (import ./scripts.nix {s = pkgs.writeShellScriptBin;}));
+          hsPkgs = pkgs.haskellPackages.override {
+            inherit overrides;
           };
-        ci =
-          hp.shellFor {
-            packages = p: [
-              p.cfg
-            ];
-            buildInputs = with pkgs;
-              [
-                haskellPackages.cabal-install
-                haskellPackages.cabal-fmt
-                hp.fourmolu_0_15_0_0
-              ]
-              ++ (builtins.attrValues (import ./scripts.nix {s = pkgs.writeShellScriptBin;}));
-        };
-      });
+        });
+  in {
+    # nix fmt
+    formatter = forAllSystems ({pkgs, ...}: pkgs.alejandra);
 
-      # nix build
-      packages = forAllSystems ({pkgs, hsPkgs, latestCompilerVersion, compilerVersions, ...}: with pkgs.lib;
-        { default = hsPkgs."${latestCompilerVersion}".cfg; 
-          printCompilerVersions = pkgs.writeShellScriptBin "printCompilerVersions" (lists.foldr (cv: acc: "echo ${cv};" + acc) "" compilerVersions);
-        } 
-        // attrsets.mapAttrs' (cv: hp: attrsets.nameValuePair "cfg${strings.toUpper cv}" hp.cfg) hsPkgs
-      );
+    # nix develop
+    devShells = forAllSystems ({
+      hsPkgs,
+      pkgs,
+      system,
+      ...
+    }: {
+      default = hsPkgs.shellFor {
+        packages = p: [
+          p.cfg
+        ];
+        buildInputs = with pkgs;
+          [
+            hsPkgs.haskell-language-server
+            haskellPackages.cabal-install
+            cabal2nix
+            hsPkgs.ghcid
+            hsPkgs.fourmolu
+            hsPkgs.cabal-fmt
+            hsPkgs.doctest
+          ]
+          ++ (builtins.attrValues (import ./scripts.nix {s = pkgs.writeShellScriptBin;}));
+      };
+      ci = hsPkgs.shellFor {
+        packages = p: [
+          p.cfg
+        ];
 
-      checks = forAllSystems ({pkgs, hsPkgs, latestCompilerVersion, compilerVersions, ...}: with pkgs.lib;
-        attrsets.mapAttrs' (cv: hp: attrsets.nameValuePair "cfg${strings.toUpper cv}" hp.cfg) hsPkgs
-      );
+        buildInputs = with pkgs;
+          [
+            haskellPackages.cabal-install
+            haskellPackages.cabal-fmt
+            hsPkgs.fourmolu_0_15_0_0
+          ]
+          ++ (builtins.attrValues (import ./scripts.nix {s = pkgs.writeShellScriptBin;}));
+      };
+    });
 
-      # nix run
-      apps = forAllSystems ({system, ...}: {
-        printCompilerVersions = { 
-          type = "app"; 
-          program = "${self.packages.${system}.printCompilerVersions}/bin/printCompilerVersions"; 
-        };
-        default = self.apps.${system}.printCompilerVersions;
-      });
-    };
+    # nix build
+    packages = forAllSystems (
+      {
+        pkgs,
+        hsPkgs,
+        ...
+      }: {
+        default = hsPkgs.cfg;
+      }
+    );
+  };
 }
