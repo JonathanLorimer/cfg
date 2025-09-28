@@ -120,8 +120,8 @@ test-suite cfg-tests
     , cfg
     , hedgehog            >=1.1   && <2.0
     , hspec               >=2.9   && <2.13
+    , hspec-api           >=2.9   && <2.13
     , hspec-core          >=2.9   && <2.13
-    , hspec-api          >=2.9   && <2.13
     , hspec-discover      >=2.9   && <2.13
     , hspec-expectations  >=0.7.0 && <1.0
     , hspec-hedgehog      >=0.0.1 && <0.4
