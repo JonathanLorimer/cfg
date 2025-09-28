@@ -63,7 +63,7 @@
           [
             haskellPackages.cabal-install
             haskellPackages.cabal-fmt
-            hsPkgs.fourmolu_0_15_0_0
+            hsPkgs.fourmolu
           ]
           ++ (builtins.attrValues (import ./scripts.nix {s = pkgs.writeShellScriptBin;}));
       };
