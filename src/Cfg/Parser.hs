@@ -80,6 +80,10 @@ data ConfigParseError
       Text
       -- ^ The key that was missing
       Text
+  | -- | Expected to find a subtree aka a 'Free' with a map in it, but instead
+    -- we found a 'Pure'.
+    ExpectedForestFoundValue
+      Text
       -- ^ The value that was found
   | -- | Expected to find a 'Pure' with a value but instead found a subtree
     ExpectedValueFoundForest
@@ -122,7 +126,7 @@ sp = L.space space1 empty empty
 
 -- | @since 0.0.1.0
 instance ValueParser () where
-  parser = string "()" >> pure ()
+  parser = void $ string "()"
 
 -- | @since 0.0.1.0
 instance ConfigParser ()
@@ -203,7 +207,7 @@ plus = char '+' >> number
 
 -- | @since 0.0.2.0
 minus :: Parser Text
-minus = liftA2 (T.cons) (char '-') number
+minus = liftA2 T.cons (char '-') number
 
 -- | @since 0.0.2.0
 number :: Parser Text
@@ -211,7 +215,7 @@ number = T.pack <$> some digitChar
 
 -- | @since 0.0.2.0
 decimal :: Parser Text
-decimal = option "" $ (T.cons) <$> char '.' <*> number
+decimal = option "" $ T.cons <$> char '.' <*> number
 
 -- | @since 0.0.2.0
 integral :: (Read a) => Parser a
@@ -219,7 +223,7 @@ integral = rd <$> (try plus <|> try minus <|> number)
 
 -- | @since 0.0.2.0
 fractional :: (Read a) => Parser a
-fractional = fmap rd $ liftA2 (<>) integral decimal
+fractional = rd <$> liftA2 (<>) integral decimal
 
 -- | @since 0.0.1.0
 instance ValueParser Double where

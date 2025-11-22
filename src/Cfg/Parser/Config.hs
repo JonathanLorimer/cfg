@@ -42,7 +42,7 @@ defaultParseConfig
   => ConfigOptions
   -> KeyTree Text Text
   -> Either ConfigParseError a
-defaultParseConfig opts tree = fmap to $ gParseConfig opts tree
+defaultParseConfig opts tree = to <$> gParseConfig opts tree
 
 -- | This class is the generic version of 'ConfigParser'. It recurses on the
 -- generic structure of a type, building up a return type for the parser.

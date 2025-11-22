@@ -341,6 +341,7 @@ import Data.ByteString (ByteString)
 import Data.Text (Text)
 import GHC.Generics
 import KeyTree
+import Cfg.Optional (OptionalConfig)
 
 -- | @since 0.0.1.0
 getConfigRaw
@@ -479,5 +480,20 @@ data AppConfig5 = AppConfig5
     via (ConfigOpts [StripPrefix "appConfig", StripSuffix "Settings", ToUpper] AppConfig5)
 
 instance DefaultSource AppConfig5 where
+  defaults "appConfigEnvironment" = Just "Development"
+  defaults _ = Nothing
+
+-- Example 6
+data AppConfig6 = AppConfig6
+  { appConfigWarpSettings :: OptionalConfig WarpConfig
+  , appConfigRedisSettings :: RedisConfig
+  , appConfigEnvironment :: Environment
+  }
+  deriving (Generic, Show)
+  deriving
+    (ConfigSource, ConfigParser)
+    via (ConfigOpts [StripPrefix "appConfig", StripSuffix "Settings", ToUpper] AppConfig6)
+
+instance DefaultSource AppConfig6 where
   defaults "appConfigEnvironment" = Just "Development"
   defaults _ = Nothing
