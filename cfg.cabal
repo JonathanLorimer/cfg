@@ -59,7 +59,7 @@ common common-opts
     UndecidableInstances
 
   build-depends:
-    , base           >=4.16.0 && <4.20
+    , base           >=4.16.0 && <5
     , containers     >=0.6    && <0.7
     , free           >=5.0.1  && <5.3
     , mtl            >=2.1    && <2.4
