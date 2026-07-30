@@ -60,7 +60,7 @@ common common-opts
 
   build-depends:
     , base           >=4.16.0 && <5
-    , containers     >=0.6    && <0.7
+    , containers     >=0.6
     , free           >=5.0.1  && <5.3
     , mtl            >=2.1    && <2.4
     , pretty-simple  >=4.0    && <4.2
@@ -134,4 +134,4 @@ test-suite documentation
   main-is:        Main.hs
   build-depends:
     , cfg
-    , doctest  >=0.21.1 && <0.23
+    , doctest  >=0.21.1
