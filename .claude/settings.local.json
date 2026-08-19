@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(cabal build *)",
-      "Bash(cabal test *)"
-    ]
-  }
-}
