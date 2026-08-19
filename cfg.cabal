@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name:          cfg
-version:       0.0.2.3
+version:       0.0.2.4
 synopsis:
   Type directed application configuration parsing and accessors
 
@@ -86,6 +86,7 @@ library
     Cfg.Deriving.Value
     Cfg.Env
     Cfg.Env.Keys
+    Cfg.Optional
     Cfg.Options
     Cfg.Parser
     Cfg.Parser.Config
@@ -112,6 +113,7 @@ test-suite cfg-tests
     Cfg.Deriving.KeyModifierSpec
     Cfg.Env.KeysSpec
     Cfg.EnvSpec
+    Cfg.OptionalSpec
     Cfg.ParserSpec
     Cfg.SourceSpec
     Spec
